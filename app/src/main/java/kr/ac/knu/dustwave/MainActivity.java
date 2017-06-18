@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.map_button :
 
                 //Open Map Activity
-                Intent intent = new Intent(this, MapActivity.class);
+                Intent intent = new Intent(this, DMapActivity.class);
                 startActivity(intent);
                 Log.d(this.getLocalClassName(), "map_button clicked ! ");
 

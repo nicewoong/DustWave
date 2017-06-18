@@ -26,8 +26,10 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:24.2.1'
     testCompile 'junit:junit:4.12'
-
     //NAVER Map api
     compile 'com.naver.maps.open:naver-map-api:2.1.2@aar'
+
+    // 다음 지도 api 사용
+    compile files('libs/libDaumMapAndroid.jar')
 
 }

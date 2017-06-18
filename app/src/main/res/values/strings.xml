@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">Dust Wave</string>
-    <string name="daum_map_view_api_key">16ca53e54263493a13ae4e3297e27f06</string>
+    <string name="app_name">Dust Wave</string> <!-- 화면 상단에 표시될 앱 이름 -->
+    <string name="daum_map_view_api_key">16ca53e54263493a13ae4e3297e27f06</string> <!-- DAUM 지도를 활용하기 위한 API KEY-->
 </resources>

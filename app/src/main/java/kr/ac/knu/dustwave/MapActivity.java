@@ -14,6 +14,8 @@ import com.nhn.android.maps.NMapController;
 import com.nhn.android.maps.NMapView;
 import com.nhn.android.maps.maplib.NGeoPoint;
 import com.nhn.android.maps.nmapmodel.NMapError;
+import com.nhn.android.mapviewer.overlay.NMapOverlayManager;
+import com.nhn.android.mapviewer.overlay.NMapResourceProvider;
 
 
 public class MapActivity extends NMapActivity implements NMapView.OnMapStateChangeListener, NMapView.OnMapViewTouchEventListener {
@@ -23,6 +25,8 @@ public class MapActivity extends NMapActivity implements NMapView.OnMapStateChan
     private final String CLIENT_ID = "LdqlbbiP8UpymwK6wdLG";// 애플리케이션 클라이언트 아이디 값
 
     private NMapController mMapController;
+
+    private NMapResourceProvider mMapViewerResourceProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,12 +55,15 @@ public class MapActivity extends NMapActivity implements NMapView.OnMapStateChan
         mMapView.setOnMapStateChangeListener(this);
         mMapView.setOnMapViewTouchEventListener(this);
 
-// use map controller to zoom in/out, pan and set map center, zoom level etc.
-        mMapController = mMapView.getMapController();
-
-
     }
 
+
+    /**
+     * 샘플 오버레이 아이템을 지도 위에 추가한다
+     */
+    public void addOverLayItem() {
+
+    }
 
 
 
