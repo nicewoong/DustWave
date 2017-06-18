@@ -1,7 +1,14 @@
 package kr.ac.knu.dustwave;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,17 +24,21 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+
+    //View
     public Button mapButton;
-//    public static String REQUEST_URL_ADDRESS = "http://www.naver.com"; //된다.
-//    public static String REQUEST_URL_ADDRESS = "http://rose.teemo.io/"; // 안 된다 .
-//    public static String REQUEST_URL_ADDRESS = "https://raw.github.com/square/okhttp/master/README.md"; //된다 .
+
+
     public static String REQUEST_URL_ADDRESS = "http://rose.teemo.io/dataall";
     public String requestResult;
     public String httpCookieData;
     public URL requestUrl;
 
+
+    // Acquire a reference to the system Location Manager
+    LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +47,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setViewAction(); // button 등의 view 들을 구성합니다.
 
 
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
         requestServerData();
+
+        addLocationChangedListener();
+
 
     }
 
@@ -46,12 +62,75 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      *
      */
     public void setViewAction() {
-        mapButton = (Button)findViewById(R.id.map_button);
+        mapButton = (Button) findViewById(R.id.map_button);
         mapButton.setOnClickListener(this);
 
     }
 
 
+    public void addLocationChangedListener() {
+        // Define a listener that responds to location updates
+        LocationListener locationListener = new LocationListener() {
+            public void onLocationChanged(Location location) {
+                // Called when a new location is found by the network location provider.
+                Log.d("LOCATION UPDATED : ", location.toString());
+            }
+
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+
+            public void onProviderEnabled(String provider) {
+            }
+
+            public void onProviderDisabled(String provider) {
+            }
+
+        };
+
+        // Register the listener with the Location Manager to receive location updates
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+
+    }
+    /**
+     * OnClick Listener
+     * @param v
+     */
+    @Override
+    public void onClick(View v) {
+
+        switch (v.getId()) {
+            case R.id.map_button :
+
+                //Open Map Activity
+                Intent intent = new Intent(this, DMapActivity.class);
+                startActivity(intent);
+                Log.d(this.getLocalClassName(), "map_button clicked ! ");
+
+                break;
+
+
+
+            default:
+
+                break;
+        }
+    }
+
+
+    /**
+     *  HTTP통신으로 서버에 데이터 요청하기!
+     *
+     */
     public void requestServerData() {
 
         new AsyncTask<Void,Void,Void>(){
@@ -107,26 +186,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }.execute();
     }
 
-
-    @Override
-    public void onClick(View v) {
-
-        switch (v.getId()) {
-            case R.id.map_button :
-
-                //Open Map Activity
-                Intent intent = new Intent(this, DMapActivity.class);
-                startActivity(intent);
-                Log.d(this.getLocalClassName(), "map_button clicked ! ");
-
-
-                break;
-
-
-
-            default:
-
-                break;
-        }
-    }
 }
