@@ -54,7 +54,7 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
 
     /**
      * 지도의 중심을 어디로 해서 보여줄지 설정
-     * todo 사용자의 현재위치를 받아서 중심점을 선택하는 기능으로 변경하기
+     * todo 사용자의 현재위치를 받아서 중심점을 선택하는 기능으로 변경하기, 흠 지도로보기에서는 굳이 사용자 위치 아니고 대구 중심으로 해도 될 것 같기도 하다.
      *
      */
     public void setMapCenter() {
@@ -62,7 +62,7 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
         mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(35.8714354, 128.601445), true); // 대구광역시
 
         // 줌 레벨 변경
-        mapView.setZoomLevel(7, true);
+        mapView.setZoomLevel(5, true);
 
 //        // 중심점 변경 + 줌 레벨 변경
 //        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(33.41, 126.52), 9, true);
@@ -88,20 +88,6 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
         marker.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
 
         mapView.addPOIItem(marker);
-
-        //custom marker
-
-//        MapPOIItem customMarker = new MapPOIItem();
-//        customMarker.setItemName("Custom Marker");
-//        customMarker.setTag(1);
-//        customMarker.setMapPoint(MapPoint.mapPointWithGeoCoord(35.8900521, 128.6113282)); // 경북대학교
-//        customMarker.setMarkerType(MapPOIItem.MarkerType.CustomImage); // 마커타입을 커스텀 마커로 지정.
-//        customMarker.setCustomImageResourceId(R.drawable.map_marker_blue); // 마커 이미지.
-//        customMarker.setCustomImageAutoscale(false); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
-//        customMarker.setCustomImageAnchor(0.5f, 1.0f); // 마커 이미지중 기준이 되는 위치(앵커포인트) 지정 - 마커 이미지 좌측 상단 기준 x(0.0f ~ 1.0f), y(0.0f ~ 1.0f) 값.
-//
-//        mapView.addPOIItem(customMarker);
-
     }
 
 
@@ -113,27 +99,12 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
         MapCircle circle1 = new MapCircle(
                 MapPoint.mapPointWithGeoCoord(35.8900521, 128.6113282), // center
                 500, // radius
-                Color.argb(128, 255, 0, 0), // strokeColor
+                Color.argb(128, 0, 255, 0), // strokeColor
                 Color.argb(128, 0, 255, 0) // fillColor
         );
         circle1.setTag(1234);
         mapView.addCircle(circle1);
 
-//        MapCircle circle2 = new MapCircle(
-//                MapPoint.mapPointWithGeoCoord(35.8900521, 128.6113282), // circle 중심 :경북대
-//                1000, // radius
-//                Color.argb(128, 255, 0, 0), // strokeColor
-//                Color.argb(128, 255, 255, 0) // fillColor
-//        );
-//        circle2.setTag(5678);
-//        mapView.addCircle(circle2);
-
-//
-//        // 지도뷰의 중심좌표와 줌레벨을 Circle이 모두 나오도록 조정.
-//        MapPointBounds[] mapPointBoundsArray = { circle1.getBound(), circle2.getBound() };
-//        MapPointBounds mapPointBounds = new MapPointBounds(mapPointBoundsArray);
-//        int padding = 50; // px
-//        mapView.moveCamera(CameraUpdateFactory.newMapPointBounds(mapPointBounds, padding));
     }
 
 
