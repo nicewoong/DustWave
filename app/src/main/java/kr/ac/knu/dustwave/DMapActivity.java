@@ -1,11 +1,15 @@
 package kr.ac.knu.dustwave;
 
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.ViewGroup;
 
+import net.daum.mf.map.api.CameraUpdateFactory;
+import net.daum.mf.map.api.MapCircle;
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
+import net.daum.mf.map.api.MapPointBounds;
 import net.daum.mf.map.api.MapView;
 
 
@@ -71,6 +75,10 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
     }
 
 
+    /**
+     * 지도 위에 지정된 위치에 maker 를 표시합니다.
+     *
+     */
     public void addMarker() {
         MapPOIItem marker = new MapPOIItem();
         marker.setItemName("Default Marker");
@@ -81,7 +89,54 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
 
         mapView.addPOIItem(marker);
 
+        //custom marker
+
+//        MapPOIItem customMarker = new MapPOIItem();
+//        customMarker.setItemName("Custom Marker");
+//        customMarker.setTag(1);
+//        customMarker.setMapPoint(MapPoint.mapPointWithGeoCoord(35.8900521, 128.6113282)); // 경북대학교
+//        customMarker.setMarkerType(MapPOIItem.MarkerType.CustomImage); // 마커타입을 커스텀 마커로 지정.
+//        customMarker.setCustomImageResourceId(R.drawable.map_marker_blue); // 마커 이미지.
+//        customMarker.setCustomImageAutoscale(false); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
+//        customMarker.setCustomImageAnchor(0.5f, 1.0f); // 마커 이미지중 기준이 되는 위치(앵커포인트) 지정 - 마커 이미지 좌측 상단 기준 x(0.0f ~ 1.0f), y(0.0f ~ 1.0f) 값.
+//
+//        mapView.addPOIItem(customMarker);
+
     }
+
+
+    /**
+     * 지도 위에 Circle 을 그립니다
+     *
+     */
+    public void addCircleOverLay() {
+        MapCircle circle1 = new MapCircle(
+                MapPoint.mapPointWithGeoCoord(35.8900521, 128.6113282), // center
+                500, // radius
+                Color.argb(128, 255, 0, 0), // strokeColor
+                Color.argb(128, 0, 255, 0) // fillColor
+        );
+        circle1.setTag(1234);
+        mapView.addCircle(circle1);
+
+//        MapCircle circle2 = new MapCircle(
+//                MapPoint.mapPointWithGeoCoord(35.8900521, 128.6113282), // circle 중심 :경북대
+//                1000, // radius
+//                Color.argb(128, 255, 0, 0), // strokeColor
+//                Color.argb(128, 255, 255, 0) // fillColor
+//        );
+//        circle2.setTag(5678);
+//        mapView.addCircle(circle2);
+
+//
+//        // 지도뷰의 중심좌표와 줌레벨을 Circle이 모두 나오도록 조정.
+//        MapPointBounds[] mapPointBoundsArray = { circle1.getBound(), circle2.getBound() };
+//        MapPointBounds mapPointBounds = new MapPointBounds(mapPointBoundsArray);
+//        int padding = 50; // px
+//        mapView.moveCamera(CameraUpdateFactory.newMapPointBounds(mapPointBounds, padding));
+    }
+
+
 
 
     // ============ MapView.MapViewEventListener 구현해야하는 메서드 ============ //
@@ -89,7 +144,8 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
     @Override
     public void onMapViewInitialized(MapView mapView) {
         setMapCenter(); //지도의 중심점 설정
-        addMarker();
+        addMarker(); // marker 표시하기
+        addCircleOverLay(); // circle  그리기
     }
 
 
