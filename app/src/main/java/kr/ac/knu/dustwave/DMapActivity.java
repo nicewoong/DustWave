@@ -84,10 +84,29 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
         marker.setItemName("Default Marker");
         marker.setTag(0);
         marker.setMapPoint(MapPoint.mapPointWithGeoCoord(35.8714354, 128.601445)); //대구 광역시 중심
-        marker.setMarkerType(MapPOIItem.MarkerType.BluePin); // 기본으로 제공하는 BluePin 마커 모양.
-        marker.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
-
+        marker.setMarkerType(MapPOIItem.MarkerType.RedPin); // 기본으로 제공하는 BluePin 마커 모양.
+        marker.setSelectedMarkerType(MapPOIItem.MarkerType.BluePin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
         mapView.addPOIItem(marker);
+
+        //남구
+        MapPOIItem marker2 = new MapPOIItem();
+        marker2.setItemName("남구");
+        marker2.setTag(0);
+        marker2.setMapPoint(MapPoint.mapPointWithGeoCoord(35.8460224,128.59752909999997)); //대구 광역시 남구
+        marker2.setMarkerType(MapPOIItem.MarkerType.YellowPin); // 기본으로 제공하는 BluePin 마커 모양.
+        marker2.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+
+        mapView.addPOIItem(marker2);
+
+        //북구
+        MapPOIItem marker3 = new MapPOIItem();
+        marker3.setItemName("북구");
+        marker3.setTag(0);
+        marker3.setMapPoint(MapPoint.mapPointWithGeoCoord(35.8857114,128.5828073)); //대구 광역시 북구
+        marker3.setMarkerType(MapPOIItem.MarkerType.YellowPin); // 기본으로 제공하는 BluePin 마커 모양.
+        marker3.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+
+        mapView.addPOIItem(marker3);
     }
 
 
@@ -96,6 +115,8 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
      *
      */
     public void addCircleOverLay() {
+
+
         MapCircle circle1 = new MapCircle(
                 MapPoint.mapPointWithGeoCoord(35.8900521, 128.6113282), // center
                 500, // radius
@@ -104,6 +125,34 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
         );
         circle1.setTag(1234);
         mapView.addCircle(circle1);
+
+        //남구
+        MapCircle circle2 = new MapCircle(
+                MapPoint.mapPointWithGeoCoord(35.8460224,128.59752909999997), // center - 대구광역시 남구
+                2500, // radius
+                Color.argb(50, 0, 255, 0), // strokeColor : green
+                Color.argb(50, 0, 255, 0) // fillColor
+        );
+        circle2.setTag(5678);
+        mapView.addCircle(circle2);
+
+        //북구
+        MapCircle circle3 = new MapCircle(
+                MapPoint.mapPointWithGeoCoord(35.8857114,128.5828073), // center - 대구광역시 북구
+                2500, // radius
+                Color.argb(50, 255, 127, 0), // strokeColor : 주황색
+                Color.argb(50, 255, 127, 0) // fillColor
+        );
+        mapView.addCircle(circle3);
+
+        //동구
+        MapCircle circle4 = new MapCircle(
+                MapPoint.mapPointWithGeoCoord(35.8866012,128.6353024), // center - 대구광역시 동구
+                2500, // radius
+                Color.argb(50, 255, 0, 0), // strokeColor : red
+                Color.argb(50, 255, 0, 0) // fillColor
+        );
+        mapView.addCircle(circle4);
 
     }
 
