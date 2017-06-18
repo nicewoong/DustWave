@@ -71,12 +71,25 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
     }
 
 
+    public void addMarker() {
+        MapPOIItem marker = new MapPOIItem();
+        marker.setItemName("Default Marker");
+        marker.setTag(0);
+        marker.setMapPoint(MapPoint.mapPointWithGeoCoord(35.8714354, 128.601445)); //대구 광역시 중심
+        marker.setMarkerType(MapPOIItem.MarkerType.BluePin); // 기본으로 제공하는 BluePin 마커 모양.
+        marker.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+
+        mapView.addPOIItem(marker);
+
+    }
+
 
     // ============ MapView.MapViewEventListener 구현해야하는 메서드 ============ //
 
     @Override
     public void onMapViewInitialized(MapView mapView) {
         setMapCenter(); //지도의 중심점 설정
+        addMarker();
     }
 
 
