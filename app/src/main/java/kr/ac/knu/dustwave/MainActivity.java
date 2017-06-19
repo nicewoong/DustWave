@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //View
     public Button mapButton;
-
+    public TextView currentLocation;
 
     public static String REQUEST_URL_ADDRESS = "http://rose.teemo.io/dataall";
     public String requestResult;
@@ -65,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mapButton = (Button) findViewById(R.id.map_button);
         mapButton.setOnClickListener(this);
 
+        currentLocation = (TextView) findViewById(R.id.textview_current_location);
+
     }
 
 
@@ -74,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onLocationChanged(Location location) {
                 // Called when a new location is found by the network location provider.
                 Log.d("LOCATION UPDATED : ", location.toString());
+                currentLocation.setText(location.getLatitude() + ", " +location.getLongitude());
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -185,5 +189,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }.execute();
     }
+
+
+
 
 }
