@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
+import net.daum.mf.map.api.MapReverseGeoCoder;
 import net.daum.mf.map.api.MapView;
 
 import java.io.BufferedReader;
@@ -30,7 +31,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, MapView.MapViewEventListener,  MapView.POIItemEventListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, MapView.MapViewEventListener,  MapView.POIItemEventListener, MapReverseGeoCoder.ReverseGeoCodingResultListener {
 
 
     //View
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         requestServerData();
 
-        addLocationChangedListener();
+        addLocationChangedListener(this);
 
     }
 
@@ -116,14 +117,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
-    public void addLocationChangedListener() {
+    /**
+     * Location 이 변경될 때 호출되는 Listener를 등록합니다
+     *
+     */
+    public void addLocationChangedListener(final MapReverseGeoCoder.ReverseGeoCodingResultListener geoCodingResultListener) {
         // Define a listener that responds to location updates
+
         LocationListener locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 // Called when a new location is found by the network location provider.
                 Log.d("LOCATION UPDATED : ", location.toString());
                 currentLocation.setText(location.getLatitude() + ", " +location.getLongitude());
+                // TODO: 2017. 6. 20. 위치를 받아왔을 때 갱신할 작업을 여기서 하면 됩니다
+
+                //위도경도 정보로 해당 주소지명 가져오기 => call back method 에서 결과 처리합시다.
+                MapReverseGeoCoder reverseGeoCoder =
+                        new MapReverseGeoCoder(getApplicationContext().getResources().getString(R.string.daum_map_view_api_key),
+                        MapPoint.mapPointWithGeoCoord(location.getLatitude(), location.getLongitude()),
+                                geoCodingResultListener,
+                        MainActivity.this);
+
+                reverseGeoCoder.startFindingAddress();
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -153,6 +168,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+    /**
+     * 지도의 중심을 어디로 해서 보여줄지 설정
+     */
+    public void initMapCenter(double latitude, double longitude) {
+        // 중심점 변경
+        mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude), true); // 대구광역시
+        // 줌 레벨 변경
+        mapView.setZoomLevel(1, true); // level 낮을 수록 확대
+
+//        // 중심점 변경 + 줌 레벨 변경
+//        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(33.41, 126.52), 9, true);
+
+        // 줌 인
+        mapView.zoomIn(false);
+
+        // 줌 아웃
+        mapView.zoomOut(false);
+    }
+
 
 
     /**
@@ -164,9 +198,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         switch (v.getId()) {
             case R.id.map_button : //지도 보기 버튼 눌렀을 때
-
-                //mapViewContainer.removeAllViews(); // 다음 맵뷰 두 개 동시에 생성 못하므로 삭제해줍시다.  <= 그리고 on resume 에서 다시 생성되죠
-
                 //Open Map Activity
                 Intent intent = new Intent(this, DMapActivity.class);
                 startActivity(intent);
@@ -248,6 +279,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onMapViewInitialized(MapView mapView) {
+        initMapCenter(35.8714354, 128.601445); //대구광역시를 중심
 
     }
 
@@ -261,8 +293,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    /**
+     * 맵이 한 번 눌렸을 때
+     * @param mapView
+     * @param mapPoint
+     */
     @Override
     public void onMapViewSingleTapped(MapView mapView, MapPoint mapPoint) {
+        // DMapActivity 를 호출합니다.
+        Intent intent = new Intent(this, DMapActivity.class);
+        startActivity(intent);
+        Log.d(this.getLocalClassName(), "map clicked ! ");
 
     }
 
@@ -309,5 +350,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onDraggablePOIItemMoved(MapView mapView, MapPOIItem mapPOIItem, MapPoint mapPoint) {
 
+    }
+
+    // ============ ReverseGeoCodingResultListener override 메서드 ============ //
+    @Override
+    public void onReverseGeoCoderFoundAddress(MapReverseGeoCoder mapReverseGeoCoder, String s) {
+        //주소를 찾은 경우
+        Log.d("REVERSE GEO CODER", s);
+    }
+
+    @Override
+    public void onReverseGeoCoderFailedToFindAddress(MapReverseGeoCoder mapReverseGeoCoder) {
+        //주소를 못 찾은 경우
+        Log.d("REVERSE GEO CODER", "주소를 못 찾았습니다 ");
     }
 }
