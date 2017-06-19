@@ -18,28 +18,30 @@
         android:orientation="vertical"
         android:layout_weight="0.5">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="지금 위치는? " />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:id="@+id/textview_current_location"
-            android:text="몰라용" />
-
-        <Button
-            android:layout_width="189dp"
-            android:layout_height="30dp"
-            android:id="@+id/map_button"
-            android:text="지도로 보기"
-            android:layout_weight="0.17" />
+            android:textStyle="bold"
+            android:textSize="25sp"
+            android:text="위치 파악 중..."/>
+        <!--<Button-->
+            <!--android:layout_width="189dp"-->
+            <!--android:layout_height="30dp"-->
+            <!--android:id="@+id/map_button"-->
+            <!--android:text="지도로 보기"-->
+            <!--android:layout_weight="0.17" />-->
 
 
     </LinearLayout>
 
 
+
+    <!---->
+    <!-- 하단 small 맵 뷰 -->
+    <!---->
     <LinearLayout
         android:layout_weight="0.5"
         android:orientation="vertical"
