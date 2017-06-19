@@ -28,9 +28,25 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
         setContentView(R.layout.activity_dmap);
 
 
+
+
+
+    }
+
+    /**
+     * 가려진 Activity 가 다시 보이게 될 때
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+
         createMapView(); // 다음 지도를 생성해서 view 를 채운다.
+    }
 
-
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mapViewContainer.removeAllViews(); // 다시 MainActivity 에 small map view 를 그려줘야하기 때문에 여기서 다음 맵을 삭제한다.
     }
 
     /**

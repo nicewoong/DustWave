@@ -13,8 +13,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+
+import net.daum.mf.map.api.MapPOIItem;
+import net.daum.mf.map.api.MapPoint;
+import net.daum.mf.map.api.MapView;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,7 +30,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, MapView.MapViewEventListener,  MapView.POIItemEventListener{
 
 
     //View
@@ -38,6 +43,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public URL requestUrl;
 
 
+    //map view 를 위한 variables
+    MapView mapView;
+    ViewGroup mapViewContainer;
+
+
     // Acquire a reference to the system Location Manager
     LocationManager locationManager;
 
@@ -47,16 +57,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         setViewAction(); // button 등의 view 들을 구성합니다.
 
-
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         requestServerData();
 
         addLocationChangedListener();
 
-
     }
 
+    /**
+     * 가려졌던 View 가 다시 보이게 될 때
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        createSmallMapView(); // 가려진 뷰가 다시 생성될 때 다음 지도를 생성해서 view 를 채운다.
+    }
+
+    /**
+     * 뷰가 가려지거나 없어지기 전 가장 기초단계
+     */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mapViewContainer.removeAllViews();
+    }
 
     /**
      * Button 등의 view 들을 구성합니다.
@@ -69,6 +95,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         currentLocation = (TextView) findViewById(R.id.textview_current_location);
 
     }
+
+    /**
+     * 다음지도API를 활용해서 맵뷰를 생성해서 activity 를 채운다.
+     *
+     */
+    public void createSmallMapView() {
+
+        mapView = new MapView(this);
+        mapView.setDaumMapApiKey(this.getResources().getString(R.string.daum_map_view_api_key)); // 다음 api key 를 인자로 넘겨준다.
+
+        mapViewContainer = (ViewGroup) findViewById(R.id.small_map_view);
+        mapViewContainer.addView(mapView);
+
+        //이벤트리스너 등록
+        mapView.setMapViewEventListener(this); // this에 MapView.MapViewEventListener 구현.
+        mapView.setPOIItemEventListener(this);
+
+
+    }
+
 
 
     public void addLocationChangedListener() {
@@ -105,6 +151,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 
     }
+
+
+
+
     /**
      * OnClick Listener
      * @param v
@@ -113,7 +163,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
 
         switch (v.getId()) {
-            case R.id.map_button :
+            case R.id.map_button : //지도 보기 버튼 눌렀을 때
+
+                //mapViewContainer.removeAllViews(); // 다음 맵뷰 두 개 동시에 생성 못하므로 삭제해줍시다.  <= 그리고 on resume 에서 다시 생성되죠
 
                 //Open Map Activity
                 Intent intent = new Intent(this, DMapActivity.class);
@@ -192,5 +244,70 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
+    // ============ Daum MapView override 메서드 ============ //
 
+    @Override
+    public void onMapViewInitialized(MapView mapView) {
+
+    }
+
+    @Override
+    public void onMapViewCenterPointMoved(MapView mapView, MapPoint mapPoint) {
+
+    }
+
+    @Override
+    public void onMapViewZoomLevelChanged(MapView mapView, int i) {
+
+    }
+
+    @Override
+    public void onMapViewSingleTapped(MapView mapView, MapPoint mapPoint) {
+
+    }
+
+    @Override
+    public void onMapViewDoubleTapped(MapView mapView, MapPoint mapPoint) {
+
+    }
+
+    @Override
+    public void onMapViewLongPressed(MapView mapView, MapPoint mapPoint) {
+
+    }
+
+    @Override
+    public void onMapViewDragStarted(MapView mapView, MapPoint mapPoint) {
+
+    }
+
+    @Override
+    public void onMapViewDragEnded(MapView mapView, MapPoint mapPoint) {
+
+    }
+
+    @Override
+    public void onMapViewMoveFinished(MapView mapView, MapPoint mapPoint) {
+
+    }
+
+    @Override
+    public void onPOIItemSelected(MapView mapView, MapPOIItem mapPOIItem) {
+
+    }
+
+    @Override
+    public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem) {
+
+    }
+
+    @Override
+    public void onCalloutBalloonOfPOIItemTouched(MapView mapView, MapPOIItem mapPOIItem, MapPOIItem.CalloutBalloonButtonType calloutBalloonButtonType) {
+
+    }
+
+    @Override
+    public void onDraggablePOIItemMoved(MapView mapView, MapPOIItem mapPOIItem, MapPoint mapPoint) {
+
+    }
 }
