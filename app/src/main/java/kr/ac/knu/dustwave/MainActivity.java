@@ -48,6 +48,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     MapView mapView;
     ViewGroup mapViewContainer;
 
+    //가장 최신 위도경도 => default 는 대구광역시 중심입니다.
+    public static double latestLatitude = 35.8714354;
+    public static double latestLongitude = 128.601445;
+
 
     // Acquire a reference to the system Location Manager
     LocationManager locationManager;
@@ -131,6 +135,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d("LOCATION UPDATED : ", location.toString());
                 // TODO: 2017. 6. 20. 위치를 받아왔을 때 갱신할 작업을 여기서 하면 됩니다
 
+                // 최신 위도경도 값 최신화
+                latestLatitude = location.getLatitude();
+                latestLongitude = location.getLongitude();
+
+                // small map view 의  중심점 변경 + 줌 레벨 변경
+                setMapCenter(location.getLatitude(), location.getLongitude());
+
                 //위도경도 정보로 해당 주소지명 가져오기 => call back method 에서 결과 처리합시다.
                 MapReverseGeoCoder reverseGeoCoder =
                         new MapReverseGeoCoder(getApplicationContext().getResources().getString(R.string.daum_map_view_api_key),
@@ -139,6 +150,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         MainActivity.this);
 
                 reverseGeoCoder.startFindingAddress();
+
+                // 해당 location 에 맞는 bus stop 1개의 미세먼지 데이터 요청 : request1 을 여기서 해주자
 
 
             }
@@ -156,18 +169,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Register the listener with the Location Manager to receive location updates
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
 
-        // location 받아오기를 요청합니다 ( 두 번째 parameter 가 interval 밀리세컨즈 )
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
+            return;
+        }else {
+            // location 받아오기를 요청합니다 ( 두 번째 parameter 가 interval 밀리세컨즈 )
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+        }
 
     }
 
@@ -175,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /**
      * 지도의 중심을 어디로 해서 보여줄지 설정
      */
-    public void initMapCenter(double latitude, double longitude) {
+    public void setMapCenter(double latitude, double longitude) {
         // 중심점 변경
         mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude), true); // 대구광역시
         // 줌 레벨 변경
@@ -189,8 +196,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // 줌 아웃
         mapView.zoomOut(false);
+
+        // 중심점에 Marker로 표시해줍니다
+        addCenterMarker(latitude, longitude);
     }
 
+
+    /**
+     * small map view 에 지정된 위치에  중심 maker 를 표시합니다.
+     *
+     */
+    public void addCenterMarker(double latitude, double longitude) {
+        MapPOIItem marker = new MapPOIItem();
+        marker.setItemName("현재 위치");
+        marker.setTag(0);
+        marker.setMapPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude)); //대구 광역시 중심
+        marker.setMarkerType(MapPOIItem.MarkerType.BluePin); // 기본으로 제공하는 BluePin 마커 모양.
+        marker.setSelectedMarkerType(MapPOIItem.MarkerType.BluePin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+        mapView.addPOIItem(marker);
+
+    }
 
 
     /**
@@ -282,7 +307,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onMapViewInitialized(MapView mapView) {
-        initMapCenter(35.8714354, 128.601445); //대구광역시를 중심
+        setMapCenter(latestLatitude, latestLongitude); //대구광역시를 중심
 
     }
 

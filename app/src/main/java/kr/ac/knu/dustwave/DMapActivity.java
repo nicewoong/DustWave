@@ -27,10 +27,6 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dmap);
 
-
-
-
-
     }
 
     /**
@@ -73,21 +69,35 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
      * todo 사용자의 현재위치를 받아서 중심점을 선택하는 기능으로 변경하기, 흠 지도로보기에서는 굳이 사용자 위치 아니고 대구 중심으로 해도 될 것 같기도 하다.
      *
      */
-    public void setMapCenter() {
+    public void setMapCenter(double latitude, double longitude) {
+        addCurrentLocationMarker(latitude, longitude);
+
         // 중심점 변경
-        mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(35.8714354, 128.601445), true); // 대구광역시
+        mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude), true); // 대구광역시
 
         // 줌 레벨 변경
-        mapView.setZoomLevel(5, true);
-
-//        // 중심점 변경 + 줌 레벨 변경
-//        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(33.41, 126.52), 9, true);
+        mapView.setZoomLevel(2, true);
 
         // 줌 인
         mapView.zoomIn(true);
 
         // 줌 아웃
         mapView.zoomOut(true);
+    }
+
+    /**
+     * 지도 위에 지정된 위치에 maker 를 표시합니다.
+     *
+     */
+    public void addCurrentLocationMarker(double latitude, double longitude) {
+        MapPOIItem marker = new MapPOIItem();
+        marker.setItemName("현재 위치");
+        marker.setTag(0);
+        marker.setMapPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude)); //대구 광역시 중심
+        marker.setMarkerType(MapPOIItem.MarkerType.BluePin); // 기본으로 제공하는 BluePin 마커 모양.
+        marker.setSelectedMarkerType(MapPOIItem.MarkerType.BluePin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+        mapView.addPOIItem(marker);
+
     }
 
 
@@ -179,9 +189,9 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
 
     @Override
     public void onMapViewInitialized(MapView mapView) {
-        setMapCenter(); //지도의 중심점 설정
+        setMapCenter(MainActivity.latestLatitude, MainActivity.latestLongitude); //지도의 중심점 설정
         addMarker(); // marker 표시하기
-        addCircleOverLay(); // circle  그리기
+        //addCircleOverLay(); // circle  그리기
     }
 
 
