@@ -36,9 +36,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //View
     public Button mapButton;
-    public TextView currentLocation;
+    public TextView currentLocation; // 현재 위치에 대한 한글 주소 표시
 
-    public static String REQUEST_URL_ADDRESS = "http://rose.teemo.io/dataall";
+    public static String REQUEST_URL_CURRENT_LOCATION = "http://rose.teemo.io/dataall";
     public String requestResult;
     public String httpCookieData;
     public URL requestUrl;
@@ -58,11 +58,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         setViewAction(); // button 등의 view 들을 구성합니다.
 
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-
-        requestServerData();
-
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE); // 위도 경도를 받아올 준비
         addLocationChangedListener(this);
+        requestServerData(); // 모든 bus stop data 요청하는  request2  를 여기에 두자.
+
+
 
     }
 
@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onPause() {
         super.onPause();
         mapViewContainer.removeAllViews();
+
     }
 
     /**
@@ -90,8 +91,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      *
      */
     public void setViewAction() {
-        mapButton = (Button) findViewById(R.id.map_button);
-        mapButton.setOnClickListener(this);
+//        mapButton = (Button) findViewById(R.id.map_button);
+//        mapButton.setOnClickListener(this);
 
         currentLocation = (TextView) findViewById(R.id.textview_current_location);
 
@@ -128,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onLocationChanged(Location location) {
                 // Called when a new location is found by the network location provider.
                 Log.d("LOCATION UPDATED : ", location.toString());
-                currentLocation.setText(location.getLatitude() + ", " +location.getLongitude());
                 // TODO: 2017. 6. 20. 위치를 받아왔을 때 갱신할 작업을 여기서 하면 됩니다
 
                 //위도경도 정보로 해당 주소지명 가져오기 => call back method 에서 결과 처리합시다.
@@ -139,6 +139,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         MainActivity.this);
 
                 reverseGeoCoder.startFindingAddress();
+
+
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -163,7 +165,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+
+        // location 받아오기를 요청합니다 ( 두 번째 parameter 가 interval 밀리세컨즈 )
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 0, locationListener);
 
     }
 
@@ -197,13 +201,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
 
         switch (v.getId()) {
-            case R.id.map_button : //지도 보기 버튼 눌렀을 때
-                //Open Map Activity
-                Intent intent = new Intent(this, DMapActivity.class);
-                startActivity(intent);
-                Log.d(this.getLocalClassName(), "map_button clicked ! ");
-
-                break;
+//            case R.id.map_button : //지도 보기 버튼 눌렀을 때
+//                //Open Map Activity
+//                Intent intent = new Intent(this, DMapActivity.class);
+//                startActivity(intent);
+//                Log.d(this.getLocalClassName(), "map_button clicked ! ");
+//                break;
 
 
 
@@ -224,13 +227,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-//                REQUEST_URL_ADDRESS = "rose.teemo.io"; //탐색하고 싶은 URL이다. <= static 으로 set 해놓을께용
+//                REQUEST_URL_CURRENT_LOCATION = "rose.teemo.io"; //탐색하고 싶은 URL이다. <= static 으로 set 해놓을께용
             }
 
             @Override
             protected Void doInBackground(Void... voids) {
                 try{
-                    requestUrl = new URL(REQUEST_URL_ADDRESS);  // URL화 한다.
+                    requestUrl = new URL(REQUEST_URL_CURRENT_LOCATION);  // URL화 한다.
                     HttpURLConnection conn = (HttpURLConnection) requestUrl.openConnection(); // URL을 연결한 객체 생성.
                     conn.setRequestMethod("GET"); // get 방식 통신
 //                    conn.setDoOutput(true);       // 쓰기모드 지정 <= 안 쓸거면 지정하지마 안돼 ㅠㅠ
@@ -355,13 +358,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // ============ ReverseGeoCodingResultListener override 메서드 ============ //
     @Override
     public void onReverseGeoCoderFoundAddress(MapReverseGeoCoder mapReverseGeoCoder, String s) {
-        //주소를 찾은 경우
+        //GeoCoding => 위도 경도 Location 정보를 통해 주소를 찾은 경우
         Log.d("REVERSE GEO CODER", s);
+        currentLocation.setText(s);
+
     }
 
     @Override
     public void onReverseGeoCoderFailedToFindAddress(MapReverseGeoCoder mapReverseGeoCoder) {
-        //주소를 못 찾은 경우
+        //GeoCoding => 위도 경도 Location 정보를 통해 주소를 찾은 경우
         Log.d("REVERSE GEO CODER", "주소를 못 찾았습니다 ");
+        currentLocation.setText("대구광역시 중구"); //default location 를 대구광역시 중구로 설정합니다
     }
 }

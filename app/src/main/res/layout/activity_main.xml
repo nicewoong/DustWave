@@ -26,7 +26,7 @@
             android:id="@+id/textview_current_location"
             android:textStyle="bold"
             android:textSize="25sp"
-            android:text="위치 파악 중..."/>
+            android:text="대구광역시 중구"/>
         <!--<Button-->
             <!--android:layout_width="189dp"-->
             <!--android:layout_height="30dp"-->
