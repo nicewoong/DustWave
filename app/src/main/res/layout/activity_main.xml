@@ -10,23 +10,186 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@drawable/btn_back"
     tools:context="kr.ac.knu.dustwave.MainActivity">
 
+    <!-- 상단 반틈 레이아웃 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_weight="0.5">
+        android:layout_weight="0.4">
+
+        <!-- 미세먼지 정보를 보여주는 뷰 -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textview_current_location"
+                android:layout_marginTop="10dp"
+                android:textSize="20sp"
+                android:layout_centerHorizontal="true"
+                android:fontFamily="sans-serif-light"
+                android:textStyle="normal"
+                android:textColor="@color/default_font"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="대구광역시 중구"/>
 
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:id="@+id/textview_current_location"
-            android:textStyle="bold"
-            android:textSize="25sp"
-            android:text="대구광역시 중구"/>
+            <ImageView
+                android:id="@+id/user_info_avatar"
+                android:src="@drawable/smile_icon"
+                android:layout_marginTop="20dp"
+                android:layout_below="@id/textview_current_location"
+                android:layout_centerHorizontal="true"
+                android:layout_width="100dp"
+                android:layout_height="100dp" />
+
+            <TextView
+                android:id="@+id/text_degree_express"
+                android:layout_marginTop="10dp"
+                android:layout_below="@id/user_info_avatar"
+                android:textSize="26sp"
+                android:layout_centerHorizontal="true"
+                android:fontFamily="sans-serif-light"
+                android:textStyle="bold"
+                android:textColor="@color/pretty_blue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="좋음"/>
+
+
+            <!-- 초미세먼지 표시하는 부분 -->
+            <RelativeLayout
+                android:id="@+id/user_info_detail_zone"
+                android:layout_below="@id/text_degree_express"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <RelativeLayout
+                    android:id="@+id/user_info_follower_zone"
+                    android:clickable="true"
+                    android:background="@drawable/btn_back"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/ultra_fine_dust"
+                        android:layout_marginTop="5dp"
+                        android:textSize="12sp"
+                        android:textColor="@color/grey_text"
+                        android:layout_centerHorizontal="true"
+                        android:text="초미세먼지"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/follower_count"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-light"
+                        android:textColor="@color/default_font"
+                        android:textSize="20sp"
+                        android:text="39"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_below="@id/ultra_fine_dust"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </RelativeLayout>
+
+                <!-- 미세먼지 표시 하는 부분 -->
+                <RelativeLayout
+                    android:id="@+id/user_info_following_zone"
+                    android:layout_toLeftOf="@id/user_info_follower_zone"
+                    android:clickable="true"
+                    android:background="@drawable/btn_back"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/fine_dust"
+                        android:layout_marginTop="5dp"
+                        android:layout_centerHorizontal="true"
+                        android:textColor="@color/grey_text"
+                        android:textSize="12sp"
+                        android:text="미세먼지"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/fine_dust_count"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-light"
+                        android:textColor="@color/default_font"
+                        android:textSize="20sp"
+                        android:text="59"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_below="@id/fine_dust"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </RelativeLayout>
+
+
+                <RelativeLayout
+                    android:id="@+id/user_info_else"
+                    android:layout_toRightOf="@id/user_info_follower_zone"
+                    android:clickable="true"
+                    android:background="@drawable/btn_back"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/elsewhere_indicator"
+                        android:layout_marginTop="5dp"
+                        android:layout_centerHorizontal="true"
+                        android:textColor="@color/grey_text"
+                        android:textSize="12sp"
+                        android:text="Elsewhere"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <ImageView
+                        android:layout_below="@id/elsewhere_indicator"
+                        android:layout_centerHorizontal="true"
+                        android:src="@drawable/earth"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp" />
+
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <!--<RelativeLayout-->
+                <!--android:id="@+id/user_info_bio"-->
+                <!--android:layout_below="@id/user_info_detail_zone"-->
+                <!--android:layout_marginBottom="30dp"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content">-->
+                <!--<TextView-->
+                    <!--android:id="@+id/user_info_bio_text"-->
+                    <!--android:layout_marginTop="5dp"-->
+                    <!--android:paddingLeft="30dp"-->
+                    <!--android:paddingRight="30dp"-->
+                    <!--android:paddingTop="10dp"-->
+                    <!--android:paddingBottom="10dp"-->
+                    <!--android:textSize="12sp"-->
+                    <!--android:fontFamily="sans-serif-light"-->
+                    <!--android:textColor="@color/grey_text"-->
+                    <!--android:maxLines="2"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content" />-->
+            <!--</RelativeLayout>-->
+
+        </RelativeLayout>
+
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:id="@+id/textview_current_location"-->
+            <!--android:textStyle="bold"-->
+            <!--android:textSize="25sp"-->
+            <!--android:text="대구광역시 중구"/>-->
         <!--<Button-->
             <!--android:layout_width="189dp"-->
             <!--android:layout_height="30dp"-->
@@ -43,7 +206,7 @@
     <!-- 하단 small 맵 뷰 -->
     <!---->
     <LinearLayout
-        android:layout_weight="0.5"
+        android:layout_weight="0.6"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

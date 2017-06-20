@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- map view using DAUM map api -->
+<!-- map view using NAVER map api -->
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
@@ -14,3 +14,4 @@
 
 
 </RelativeLayout>
+
