@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //map view 를 위한 variables
     MapView mapView;
     ViewGroup mapViewContainer;
+    MapPOIItem marker ; //중심점 마커
 
     //가장 최신 위도경도 => default 는 대구광역시 중심입니다.
     public static double latestLatitude = 35.8714354;
@@ -207,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      *
      */
     public void addCenterMarker(double latitude, double longitude) {
-        MapPOIItem marker = new MapPOIItem();
+        marker = new MapPOIItem();
         marker.setItemName("현재 위치");
         marker.setTag(0);
         marker.setMapPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude)); //대구 광역시 중심
