@@ -20,8 +20,8 @@ public class LocalDatabaseKey {
     public static final String dust_info_pm10_predict = "PM_10_PRED";
     public static final String dust_info_pm25_predict = "PM_25_PRED";
     public static final String dust_info_temperature = "TEMP";
-    public static final String dust_info_wind_speed = "WIND_SPEED";
-    public static final String dust_info_wind_direction = "WIND_DIRECTION";
+    public static final String dust_info_wind_speed = "WiNDsSPEED";
+    public static final String dust_info_wind_direction = "WiNDIRECTION";
     public static final String dust_info_humidity = "HUMIDITY";
     public static final String dust_info_weather = "WEATHER";
     public static final String dust_info_time = "TIME";

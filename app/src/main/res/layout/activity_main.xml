@@ -58,7 +58,7 @@
                 android:textColor="@color/pretty_blue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="좋음"/>
+                android:text="보통"/>
 
 
             <!-- 초미세먼지 표시하는 부분 -->
@@ -84,7 +84,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
                     <TextView
-                        android:id="@+id/follower_count"
+                        android:id="@+id/ultra_fine_dust_count"
                         android:textStyle="bold"
                         android:fontFamily="sans-serif-light"
                         android:textColor="@color/default_font"
@@ -159,43 +159,10 @@
                 </RelativeLayout>
             </RelativeLayout>
 
-            <!--<RelativeLayout-->
-                <!--android:id="@+id/user_info_bio"-->
-                <!--android:layout_below="@id/user_info_detail_zone"-->
-                <!--android:layout_marginBottom="30dp"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content">-->
-                <!--<TextView-->
-                    <!--android:id="@+id/user_info_bio_text"-->
-                    <!--android:layout_marginTop="5dp"-->
-                    <!--android:paddingLeft="30dp"-->
-                    <!--android:paddingRight="30dp"-->
-                    <!--android:paddingTop="10dp"-->
-                    <!--android:paddingBottom="10dp"-->
-                    <!--android:textSize="12sp"-->
-                    <!--android:fontFamily="sans-serif-light"-->
-                    <!--android:textColor="@color/grey_text"-->
-                    <!--android:maxLines="2"-->
-                    <!--android:layout_width="match_parent"-->
-                    <!--android:layout_height="wrap_content" />-->
-            <!--</RelativeLayout>-->
+
 
         </RelativeLayout>
 
-        <!--<TextView-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center"-->
-            <!--android:id="@+id/textview_current_location"-->
-            <!--android:textStyle="bold"-->
-            <!--android:textSize="25sp"-->
-            <!--android:text="대구광역시 중구"/>-->
-        <!--<Button-->
-            <!--android:layout_width="189dp"-->
-            <!--android:layout_height="30dp"-->
-            <!--android:id="@+id/map_button"-->
-            <!--android:text="지도로 보기"-->
-            <!--android:layout_weight="0.17" />-->
 
 
     </LinearLayout>

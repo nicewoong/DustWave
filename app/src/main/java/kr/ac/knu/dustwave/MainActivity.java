@@ -22,33 +22,26 @@ import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapReverseGeoCoder;
 import net.daum.mf.map.api.MapView;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, MapView.MapViewEventListener,  MapView.POIItemEventListener, MapReverseGeoCoder.ReverseGeoCodingResultListener {
+public class MainActivity extends AppCompatActivity implements MapView.MapViewEventListener, MapView.POIItemEventListener, MapReverseGeoCoder.ReverseGeoCodingResultListener, LocationListener, CurrentLocationDustInfoHttpRequestListener, AllBusStopDustInfoHttpRequestListener {
 
 
     //View
-    public Button mapButton;
     public TextView currentLocation; // 현재 위치에 대한 한글 주소 표시
-
-    public static String REQUEST_URL_ALL_DUST_INFO = "http://rose.teemo.io/all_dust_data";
-    public static String REQUEST_URL_LOCATION_DUST_INFO = "http://rose.teemo.io/LOCATION?LON=35.8714354&LAT=128.601445";
-    public String requestResult;
-    public String httpCookieData;
-    public URL requestUrl;
+    public TextView fineDustCount; // 미세먼지 수치
+    public TextView ultraFineDustCount; // 초 미세먼지 수치
+    public TextView textDegreeExpress; // 미세먼지 레벨 표시 (좋음 보통 나쁨 매우나쁨)
 
 
     //map view 를 위한 variables
     MapView mapView;
     ViewGroup mapViewContainer;
-    MapPOIItem marker ; //중심점 마커
+    MapPOIItem marker; //중심점 마커
 
     //가장 최신 위도경도 => default 는 대구광역시 중심입니다.
     public static double latestLatitude = 35.8714354;
@@ -58,18 +51,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Acquire a reference to the system Location Manager
     LocationManager locationManager;
 
+    //현재 위치에 맞는 미세먼지 데이터
+    public CurrentLocationDustInfo currentLocationDustInfo = new CurrentLocationDustInfo();
+    //모든 버정의 미세먼지 데이터
+    public AllBusStopDustInfo allBusStopDustInfo = new AllBusStopDustInfo();;
+
+
+    //모든 버스 정류장 미세먼지 최신 데이터 array
+    public static JSONArray allBusStopDustInfoList;
+    public static JSONObject currentLocationDustInfoObject;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setViewAction(); // button 등의 view 들을 구성합니다.
 
+        allBusStopDustInfo.requestAllData(this);
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE); // 위도 경도를 받아올 준비
-        addLocationChangedListener(this);
-        requestServerData(); // 모든 bus stop data 요청하는  request2  를 여기에 두자.
-
-
-
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+        }
+        Log.d("MainActivity:onCreate()","위치정보 업데이트를 요청합니다. ");
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
     }
 
     /**
@@ -80,6 +84,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
 
         createSmallMapView(); // 가려진 뷰가 다시 생성될 때 다음 지도를 생성해서 view 를 채운다.
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+        }
+        Log.d("MainActivity:onResume()","위치정보 업데이트를 요청합니다. ");
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+
+
     }
 
     /**
@@ -97,10 +109,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      *
      */
     public void setViewAction() {
-//        mapButton = (Button) findViewById(R.id.map_button);
-//        mapButton.setOnClickListener(this);
-
         currentLocation = (TextView) findViewById(R.id.textview_current_location);
+        fineDustCount = (TextView) findViewById(R.id.fine_dust_count);
+        ultraFineDustCount = (TextView) findViewById(R.id.ultra_fine_dust_count);
+        textDegreeExpress = (TextView) findViewById(R.id.text_degree_express);
 
     }
 
@@ -125,63 +137,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
     /**
-     * Location 이 변경될 때 호출되는 Listener를 등록합니다
-     *
-     */
-    public void addLocationChangedListener(final MapReverseGeoCoder.ReverseGeoCodingResultListener geoCodingResultListener) {
-        // Define a listener that responds to location updates
-
-        LocationListener locationListener = new LocationListener() {
-            public void onLocationChanged(Location location) {
-                // Called when a new location is found by the network location provider.
-                Log.d("LOCATION UPDATED : ", location.toString());
-                // TODO: 2017. 6. 20. 위치를 받아왔을 때 갱신할 작업을 여기서 하면 됩니다
-
-                // 최신 위도경도 값 최신화
-                latestLatitude = location.getLatitude();
-                latestLongitude = location.getLongitude();
-
-                // small map view 의  중심점 변경 + 줌 레벨 변경
-                setMapCenter(location.getLatitude(), location.getLongitude());
-
-                //위도경도 정보로 해당 주소지명 가져오기 => call back method 에서 결과 처리합시다.
-                MapReverseGeoCoder reverseGeoCoder =
-                        new MapReverseGeoCoder(getApplicationContext().getResources().getString(R.string.daum_map_view_api_key),
-                        MapPoint.mapPointWithGeoCoord(location.getLatitude(), location.getLongitude()),
-                                geoCodingResultListener,
-                        MainActivity.this);
-
-                reverseGeoCoder.startFindingAddress();
-
-                // 해당 location 에 맞는 bus stop 1개의 미세먼지 데이터 요청 : request1 을 여기서 해주자
-
-
-            }
-
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-
-            public void onProviderEnabled(String provider) {
-            }
-
-            public void onProviderDisabled(String provider) {
-            }
-
-        };
-
-        // Register the listener with the Location Manager to receive location updates
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-            return;
-        }else {
-            // location 받아오기를 요청합니다 ( 두 번째 parameter 가 interval 밀리세컨즈 )
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-        }
-
-    }
-
-
-    /**
      * 지도의 중심을 어디로 해서 보여줄지 설정
      */
     public void setMapCenter(double latitude, double longitude) {
@@ -189,9 +144,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude), true); // 대구광역시
         // 줌 레벨 변경
         mapView.setZoomLevel(1, true); // level 낮을 수록 확대
-
-//        // 중심점 변경 + 줌 레벨 변경
-//        mapView.setMapCenterPointAndZoomLevel(MapPoint.mapPointWithGeoCoord(33.41, 126.52), 9, true);
 
         // 줌 인
         mapView.zoomIn(false);
@@ -220,89 +172,73 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+
     /**
-     * OnClick Listener
-     * @param v
+     - Json object 를 인자로 받아서 UI에 표시하는 함수
+     - 이름 : updateCurrentLocationDustDataView()
+     - 인자는 현재 위치에 대한 미세먼지 값 담고 있는 json Object
+     => 이것은 MainActivity 에 있어야 한다.
+
      */
-    @Override
-    public void onClick(View v) {
+    public void updateCurrentLocationDustDataView(JSONObject currentLocationDustInfo) {
 
-        switch (v.getId()) {
-//            case R.id.map_button : //지도 보기 버튼 눌렀을 때
-//                //Open Map Activity
-//                Intent intent = new Intent(this, DMapActivity.class);
-//                startActivity(intent);
-//                Log.d(this.getLocalClassName(), "map_button clicked ! ");
-//                break;
+        if(currentLocationDustInfo == null)
+            return;
+
+        double dustInfoPm10; //미세먼지
+        double dustInfoPm25; //초미세먼지
 
 
 
-            default:
+        try {
+            dustInfoPm10 = currentLocationDustInfo.getDouble(LocalDatabaseKey.dust_info_pm10);
+            dustInfoPm25 = currentLocationDustInfo.getDouble(LocalDatabaseKey.dust_info_pm25);
 
-                break;
+            fineDustCount.setText(dustInfoPm10+""); // 미세먼지
+            ultraFineDustCount.setText(dustInfoPm25+""); // 초미세먼지
+            textDegreeExpress.setText(getFineDustLevelText(dustInfoPm10)); // 좋음인지 나쁨인지
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-    }
 
+    }
 
     /**
-     *  HTTP통신으로 서버에 데이터 요청하기!
+     * 미세먼지 10 수치에 따라서
+     * 좋음 보통 나쁨 매우나쁨 을 판단해서
+     * String으로 return 합니다.
      *
+     * @param fineDustPm10
+     * @return
      */
-    public void requestServerData() {
+    public String getFineDustLevelText(double fineDustPm10) {
 
-        new AsyncTask<Void,Void,Void>(){
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-//                REQUEST_URL_ALL_DUST_INFO = "rose.teemo.io"; //탐색하고 싶은 URL이다. <= static 으로 set 해놓을께용
-            }
-
-            @Override
-            protected Void doInBackground(Void... voids) {
-                try{
-                    requestUrl = new URL(REQUEST_URL_ALL_DUST_INFO);  // URL화 한다.
-//                    requestUrl = new URL(REQUEST_URL_LOCATION_DUST_INFO);  // URL화 한다.
-                    HttpURLConnection conn = (HttpURLConnection) requestUrl.openConnection(); // URL을 연결한 객체 생성.
-                    conn.setRequestMethod("GET"); // get 방식 통신
-//                    conn.setDoOutput(true);       // 쓰기모드 지정 <= 안 쓸거면 지정하지마 안돼 ㅠㅠ
-                    conn.setDoInput(true);        // 읽기모드 지정
-                    conn.setUseCaches(false);     // 캐싱데이터를 받을지 안받을지
-                    conn.setDefaultUseCaches(false); // 캐싱데이터 디폴트 값 설정
-//                    conn.setRequestProperty("Content-Type","application/json");
-
-                    httpCookieData = conn.getHeaderField("Set-Cookie"); //쿠키데이터 보관
-
-                    InputStream is = conn.getInputStream();        //input스트림 개방
-
-                    StringBuilder builder = new StringBuilder();   //문자열을 담기 위한 객체
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(is,"UTF-8"));  //문자열 셋 세팅
-                    String line;
-
-                    while ((line = reader.readLine()) != null) {
-                        builder.append(line+ "\n");
-                    }
-
-                    requestResult = builder.toString();
-
-                }catch(MalformedURLException | ProtocolException exception) {
-                    exception.printStackTrace();
-                }catch(IOException io){
-                    io.printStackTrace();
-                }
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-
-                if(requestResult!=null)
-                    Log.d("HTTP URL REQUEST RESULT",requestResult);
-                else
-                    Log.d("HTTP URL REQUEST RESULT", "NULL이네요. 아무것도 안 받아와요. ");
-            }
-        }.execute();
+        if (fineDustPm10 <= 30)
+            return "좋음"; //파랑색
+        else if (fineDustPm10 > 30 && fineDustPm10 <= 80)
+            return "보통"; //초록색
+        else if (fineDustPm10 > 80 && fineDustPm10 <= 150)
+            return "나쁨"; //주황색
+        else
+            return "매우나쁨"; //빨강색
     }
+
+
+    public void setFineDustLevelImage(double fineDustPm10) {
+
+        if (fineDustPm10 <= 30) {
+//            return "좋음"; //파랑색
+        }else if (fineDustPm10 > 30 && fineDustPm10 <= 80) {
+//            return "보통"; //초록색
+        }else if (fineDustPm10 > 80 && fineDustPm10 <= 150) {
+//            return "나쁨"; //주황색
+        }else {
+//            return "매우나쁨"; //빨강색
+        }
+
+    }
+
 
 
 
@@ -395,7 +331,109 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onReverseGeoCoderFailedToFindAddress(MapReverseGeoCoder mapReverseGeoCoder) {
         //GeoCoding => 위도 경도 Location 정보를 통해 주소를 찾은 경우
-        Log.d("REVERSE GEO CODER", "주소를 못 찾았습니다 ");
+        Log.d("REVERSE GEO CODER", "주소 text 를 못 찾았습니다 ");
         currentLocation.setText("대구광역시"); //default location 를 대구광역시 중구로 설정합니다
+    }
+
+    // ============ LocationListener override 메서드 ============ //
+
+    /**
+     * 위치 정보가 갱신 됐을 때 !
+     * @param location
+     */
+    @Override
+    public void onLocationChanged(Location location) {
+
+        // Called when a new location is found by the network location provider.
+        Log.d("LOCATION UPDATED : ", location.toString());
+
+        // 최신 위도경도 값 최신화
+        latestLatitude = location.getLatitude();
+        latestLongitude = location.getLongitude();
+
+        // 위도 경도에 따른 미세먼지 데이터 하나 요청
+        currentLocationDustInfo.requestCurrentDataByLocation(this, latestLatitude, latestLongitude);
+
+        // small map view 의  중심점 변경 + 줌 레벨 변경
+        setMapCenter(location.getLatitude(), location.getLongitude());
+
+        //위도경도 정보로 해당 주소지명 가져오기 => call back method 에서 결과 처리합시다.
+        MapReverseGeoCoder reverseGeoCoder =
+                new MapReverseGeoCoder(getApplicationContext().getResources().getString(R.string.daum_map_view_api_key),
+                        MapPoint.mapPointWithGeoCoord(location.getLatitude(), location.getLongitude()),
+                        this,
+                        MainActivity.this);
+
+        reverseGeoCoder.startFindingAddress();
+
+
+
+        /*
+        한 번 받아왔으니 중지 !
+         */
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            return;
+        }
+        locationManager.removeUpdates(this);
+
+
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+
+    // ============ HTTP 로 현재 위도,경도에 맞는 미세먼지 데이터 요청 override 메서드 ============ //
+    /**
+     *
+     * @param requestStream
+     */
+    @Override
+    public void onCurrentLocationDataStringArrived(String requestStream) {
+        if(requestStream!=null) {
+            Log.d("MAIN:onCurrentArrived", "현재 위치에 해당하는 미세먼지 정보 http 요청 결과가 도착했습니다. \n -> " + requestStream);
+            // json object로 변경
+            currentLocationDustInfoObject = currentLocationDustInfo.convertCurrentLocationDustDataToObject(requestStream);
+            // 뷰 갱신 !!
+            updateCurrentLocationDustDataView(currentLocationDustInfoObject);
+        }else {
+            Log.e("MAIN:onArrived", " NULL 이네요. 아무것도 안 받아와요. ");
+
+        }
+
+
+
+    }
+
+    // ============ 모든 정류장의 미세먼지 데이터 요청 override 메서드 ============ //
+    @Override
+    public void onAllBusStopDustInfoDataStringArrived(String requestStream) {
+        if(requestStream!=null) {
+            Log.d("MAIN:onAllBusArrived", requestStream);
+            Log.d("MAIN:onAllBusArrived", "전체 버정 데이터 셋 배열 갯수 : "+allBusStopDustInfo.convertAllRecentDustDataToJasonArray(requestStream).length()+"");
+
+            // 일단 JsonArray를 MainActivity(here)의 static 변수에 저장하고, 써먹자.
+
+        }else {
+            Log.e("MAIN:onAllBusArrived", "NULL 이네요. 아무것도 안 받아와요. ");
+
+        }
+
+        //
+        allBusStopDustInfo.convertAllRecentDustDataToJasonArray(requestStream).length();
     }
 }

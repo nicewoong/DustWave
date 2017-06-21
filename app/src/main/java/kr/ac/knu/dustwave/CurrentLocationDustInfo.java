@@ -23,8 +23,10 @@ import java.net.URL;
 public class CurrentLocationDustInfo {
 
 
-    public static String REQUEST_URL_ALL_DUST_INFO = "http://rose.teemo.io/dataall";
-    public static String REQUEST_URL_LOCATION_DUST_INFO = "http://rose.teemo.io/LOCATION?LON=35.8714354&LAT=128.601445";
+//    "http://rose.teemo.io/LOCATION?LON=35.8714354&LAT=128.601445";
+    public static String REQUEST_URL_LOCATION_DUST_INFO_BASE = "http://rose.teemo.io/LOCATION?";
+
+    public static final String LOG_TAG = "CurrentLocationDustInfo";
 
 
     //Async Task HTTP 통신
@@ -58,7 +60,8 @@ public class CurrentLocationDustInfo {
             @Override
             protected Void doInBackground(Void... voids) {
                 try{
-                    requestUrl = new URL(REQUEST_URL_LOCATION_DUST_INFO);  // URL화 한다.
+                    Log.d(LOG_TAG, "현재 위치에 해당하는 미세먼지 정보를 http 요청합니다. ");
+                    requestUrl = new URL(REQUEST_URL_LOCATION_DUST_INFO_BASE + "LON=" + longitude + "&LAT=" + latitude);  // URL화 한다.
                     HttpURLConnection conn = (HttpURLConnection) requestUrl.openConnection(); // URL을 연결한 객체 생성.
                     conn.setRequestMethod("GET"); // get 방식 통신
                     conn.setDoInput(true);        // 읽기모드 지정
@@ -91,7 +94,6 @@ public class CurrentLocationDustInfo {
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-
                 // 데이터 도착했다고 콜백 메서드 날려줍니다.
                 dustInfoHttpRequestListener.onCurrentLocationDataStringArrived(requestResult);
 
@@ -130,64 +132,7 @@ public class CurrentLocationDustInfo {
 
 
 
-    /**
-     - Json object 를 인자로 받아서 UI에 표시하는 함수
-     - 이름 : updateCurrentLocationDustDataView()
-     - 인자는 현재 위치에 대한 미세먼지 값 담고 있는 json Object
-     => 이것은 MainAcitvity 에 있어야 한다.
-
-     */
-    public void updateCurrentLocationDustDataView(JSONObject currentLocationDustInfo) {
-
-
-    }
-
-
-    /* =====================================================================
-     필요한 메서드
 
 
 
-
-
-
-
-
-
-
-     -------------------------------
-
-     -> request 2 에 대해서
-
-         - request 요청하는 함수
-            - 이름 : requestAllRecentDustData()
-            - 모든 버스 정보를 요청하기만 함 HTTP 통신을 통해 AsyncTask 로 요청.
-            - 콜백 메서드를 안에서 포함하겠군
-            - 콜백 메서드 안에서 DATA 가 날라오면 string 으로 오는 모든 정류장 미세먼지 정보를 -> jason object  array 로 바꾸는 메서드 필요하네
-
-         - string 의 모든 정류장 미세먼지 정보를 -> jason object array 로 바꿔주는 메서드
-            - 이름 : convertAllRecentDustDataToJasonArray
-            - 인자를 String 으로 받는다
-            - 내부에서 Jason object로 바꿔서 array로 만든다음
-            - return 을 Jason array 형식으로 한다
-
-        - json object array 로 입력된 모든 정류장 미세먼지 정보를 -> Local DB Dust info table 에 저장하는 메서드
-            - 이름 : saveAllRecentDustDataToLocalDB
-            - Json Array 를 인자로 받는다
-            - 반복문을 돌려서 object 하나씩 뽑은 다음 object 에서 원소 하나씩 뽑은 다음 기존 데이터 밀고 새로 집어넣는다 <= 우선은 이렇게 합시다:)
-            -> 이거 호출한 다음에는 바로 view 갱신하는 메서드 호출해줘야겠네
-
-
-        - Local DB 에서 모든 정류장 미세먼지 정보를 버스 stop 정보와 join 해서 Json object array 형태로 반환하는 메서드
-
-
-        - json object array 를 인풋으로 받아서 지도에 띄워주는 메서드? ㅇㅇ 여기에서 map 을 인자로 받아서 .
-            - 이름 : addAllDustInfoMarkerOnMap()
-            - 인자 : 모든 버스 stop 미세먼지 정보를 담고 있는 jsonArray()
-            -
-
-
-
-
-     */
 }

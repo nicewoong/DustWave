@@ -1,6 +1,7 @@
 package kr.ac.knu.dustwave;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,6 +23,8 @@ import java.net.URL;
 public class AllBusStopDustInfo {
 
     public static String REQUEST_URL_ALL_DUST_INFO = "http://rose.teemo.io/dataall";
+
+    public static final String LOG_TAG = "AllBusStopDustInfo";
 
     //Async Task HTTP 통신
     public static URL requestUrl;
@@ -52,6 +55,7 @@ public class AllBusStopDustInfo {
             @Override
             protected Void doInBackground(Void... voids) {
                 try{
+                    Log.d(LOG_TAG, "모든 버스 정류장의 최신 미세먼지 정보를 http 요청합니다. ");
                     requestUrl = new URL(REQUEST_URL_ALL_DUST_INFO);  // URL화 한다.
                     HttpURLConnection conn = (HttpURLConnection) requestUrl.openConnection(); // URL을 연결한 객체 생성.
                     conn.setRequestMethod("GET"); // get 방식 통신
@@ -85,7 +89,7 @@ public class AllBusStopDustInfo {
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-
+                Log.d(LOG_TAG, "모든 버스정류장의 미세먼지 정보 http 요청 결과가 도착했습니다. ");
                 // 데이터 도착했다고 콜백 메서드 날려줍니다.
                 allDustInfoRequestListener.onAllBusStopDustInfoDataStringArrived(requestResult);
 
