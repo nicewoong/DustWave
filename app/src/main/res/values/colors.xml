@@ -5,9 +5,11 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="red">#ffff0000</color>
-    <color name="toolbar_back">#fffafafa</color>
+    <color name="toolbar_back">#fffafafa</color>  backgorund color
+    <!--<color name="toolbar_back">#FFCCCC</color>-->
     <color name="content_back">#fffafafa</color>
     <color name="main_back">#ffeeeeee</color>
+
     <color name="default_font">#ff000000</color>
     <color name="pretty_blue">#ff0097cd</color>
     <color name="pretty_green">#ff57ad68</color>

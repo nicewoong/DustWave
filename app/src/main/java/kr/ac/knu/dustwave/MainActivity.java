@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public Button mapButton;
     public TextView currentLocation; // 현재 위치에 대한 한글 주소 표시
 
-    public static String REQUEST_URL_CURRENT_LOCATION = "http://rose.teemo.io/dataall";
+    public static String REQUEST_URL_ALL_DUST_INFO = "http://rose.teemo.io/all_dust_data";
+    public static String REQUEST_URL_LOCATION_DUST_INFO = "http://rose.teemo.io/LOCATION?LON=35.8714354&LAT=128.601445";
     public String requestResult;
     public String httpCookieData;
     public URL requestUrl;
@@ -253,13 +254,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
-//                REQUEST_URL_CURRENT_LOCATION = "rose.teemo.io"; //탐색하고 싶은 URL이다. <= static 으로 set 해놓을께용
+//                REQUEST_URL_ALL_DUST_INFO = "rose.teemo.io"; //탐색하고 싶은 URL이다. <= static 으로 set 해놓을께용
             }
 
             @Override
             protected Void doInBackground(Void... voids) {
                 try{
-                    requestUrl = new URL(REQUEST_URL_CURRENT_LOCATION);  // URL화 한다.
+                    requestUrl = new URL(REQUEST_URL_ALL_DUST_INFO);  // URL화 한다.
+//                    requestUrl = new URL(REQUEST_URL_LOCATION_DUST_INFO);  // URL화 한다.
                     HttpURLConnection conn = (HttpURLConnection) requestUrl.openConnection(); // URL을 연결한 객체 생성.
                     conn.setRequestMethod("GET"); // get 방식 통신
 //                    conn.setDoOutput(true);       // 쓰기모드 지정 <= 안 쓸거면 지정하지마 안돼 ㅠㅠ
@@ -394,6 +396,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onReverseGeoCoderFailedToFindAddress(MapReverseGeoCoder mapReverseGeoCoder) {
         //GeoCoding => 위도 경도 Location 정보를 통해 주소를 찾은 경우
         Log.d("REVERSE GEO CODER", "주소를 못 찾았습니다 ");
-        currentLocation.setText("대구광역시 중구"); //default location 를 대구광역시 중구로 설정합니다
+        currentLocation.setText("대구광역시"); //default location 를 대구광역시 중구로 설정합니다
     }
 }
