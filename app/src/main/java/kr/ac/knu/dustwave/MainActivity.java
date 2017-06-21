@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
     //현재 위치에 맞는 미세먼지 데이터
     public CurrentLocationDustInfo currentLocationDustInfo = new CurrentLocationDustInfo();
     //모든 버정의 미세먼지 데이터
-    public AllBusStopDustInfo allBusStopDustInfo = new AllBusStopDustInfo();;
+    public AllBusStopDustInfo allBusStopDustInfo = new AllBusStopDustInfo(getApplicationContext());;
 
 
     //모든 버스 정류장 미세먼지 최신 데이터 array

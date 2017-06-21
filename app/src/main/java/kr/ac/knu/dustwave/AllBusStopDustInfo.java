@@ -1,5 +1,7 @@
 package kr.ac.knu.dustwave;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -31,14 +33,24 @@ public class AllBusStopDustInfo {
     public static String requestResult;
     public static String httpCookieData;
 
+    //Context
+    public Context context;
+
+
+
+    public AllBusStopDustInfo(Context context) {
+        this.context  = context;
+    }
+
 
 
     /**
-     -> request1 에 대해서
-     - request1 요청하는 함수
-     - 이름 : requestCurrentDataByLocation()
-     - 현재 위도 경도를 변수에 담아서 HTTP AsyncTask 로 요청
-     - 요청 도착하면 JSONobject String으로 날라올꺼잖아
+     - request 요청하는 함수
+     - 이름 : requestAllRecentDustData()
+     - 모든 버스 정보를 요청하기만 함 HTTP 통신을 통해 AsyncTask 로 요청.
+     - 콜백 메서드를 안에서 포함하겠군
+     - 콜백 메서드 안에서 DATA 가 날라오면 string 으로 오는 모든 정류장 미세먼지 정보를 -> jason object  array 로 바꾸는 메서드 필요하네
+
      */
     public void requestAllData(final AllBusStopDustInfoHttpRequestListener allDustInfoRequestListener) {
 
@@ -101,10 +113,12 @@ public class AllBusStopDustInfo {
 
 
     /**
-     - 현재 위치에 맞는 먼지 데이터를 담고 있는 string 결과를 ->  json object로 변경해서 리턴해주는 함수
-     - 이름 : convertCurrentLocationDustDataToJsonObject()
-     - 인자는 string
-     - return Json object 형식 변환해서 .
+     - string 의 모든 정류장 미세먼지 정보를 -> jason object array 로 바꿔주는 메서드
+     - 이름 : convertAllRecentDustDataToJasonArray
+     - 인자를 String 으로 받는다
+     - 내부에서 Jason object로 바꿔서 array로 만든다음
+     - return 을 Jason array 형식으로 한다
+
 
      * @param jsonDataStream
      * @return null 이 반환될 수 있음 !
@@ -128,14 +142,71 @@ public class AllBusStopDustInfo {
 
 
 
-    /**
-     - Json object 를 인자로 받아서 UI에 표시하는 함수
-     - 이름 : updateCurrentLocationDustDataView()
-     - 인자는 현재 위치에 대한 미세먼지 값 담고 있는 json Object
-     => 이것은 MainAcitvity 에 있어야 한다.
 
+    /**
+     * 새로 받아온 전체 정류장 먼지 정보들을 Local DB에 갱신해서 저장합니다
+     *
+     * @param allBusStopInfoList
      */
-    public void updateCurrentLocationDustDataView(JSONObject currentLocationDustInfo) {
+    public void updateAllBusStopDustInfoToLocal(JSONArray allBusStopInfoList) {
+
+        //전체 테이블 새로 갱신할 거니까 그냥 기존의 것 삭제하고
+        clearAllBusDustInfoTable();
+
+        //전부 새로 insert
+        for(int i=0 ; i<allBusStopInfoList.length(); i++) {
+            try {
+                insertBusStopDustInfoToLocal(allBusStopInfoList.getJSONObject(i));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    /**
+     * 모든 정류장의 먼지정보 테이블 전체 데이터를 삭제합니다.
+     *
+     */
+    public void clearAllBusDustInfoTable() {
+        LocalDatabase mDatabase = LocalDatabase.getInstance(context);
+
+        try {
+            mDatabase.execSQL("DELETE FROM " + LocalDatabase.TABLE_DUST_INFO);
+
+        }catch(Exception e){
+            Log.e(LOG_TAG, e.getMessage());
+        }
+    }
+
+
+    /**
+     *
+     * @return
+     */
+    public boolean insertBusStopDustInfoToLocal(JSONObject busStopDustInfoObject) throws JSONException {
+
+        LocalDatabase mDatabase = LocalDatabase.getInstance(context);
+
+        if (mDatabase.writableOpen()) {
+            String SQL = "INSERT INTO " + LocalDatabase.TABLE_DUST_INFO +
+                    " (" +
+                    LocalDatabaseKey.bus_stop_id + ", " +
+                    LocalDatabaseKey.dust_info_pm10 + ", " +
+                    LocalDatabaseKey.dust_info_pm25 +
+                    " ) " +
+
+                    "VALUES (" +
+                    busStopDustInfoObject.getString( LocalDatabaseKey.bus_stop_id) + ", " + //Number
+                    busStopDustInfoObject.getString( LocalDatabaseKey.dust_info_pm10) + ", " + //Number
+                    busStopDustInfoObject.getString( LocalDatabaseKey.dust_info_pm25) +
+                    " )";
+
+            return mDatabase.execSQL(SQL);
+        } else {
+            Log.e(LOG_TAG,"데이터베이스 insert 에러");
+            return false;
+        }
 
 
     }
@@ -144,48 +215,7 @@ public class AllBusStopDustInfo {
     /* =====================================================================
      필요한 메서드
 
-
-
-
-
-
-
-
-
-
-     -------------------------------
-
-     -> request 2 에 대해서
-
-         - request 요청하는 함수
-            - 이름 : requestAllRecentDustData()
-            - 모든 버스 정보를 요청하기만 함 HTTP 통신을 통해 AsyncTask 로 요청.
-            - 콜백 메서드를 안에서 포함하겠군
-            - 콜백 메서드 안에서 DATA 가 날라오면 string 으로 오는 모든 정류장 미세먼지 정보를 -> jason object  array 로 바꾸는 메서드 필요하네
-
-         - string 의 모든 정류장 미세먼지 정보를 -> jason object array 로 바꿔주는 메서드
-            - 이름 : convertAllRecentDustDataToJasonArray
-            - 인자를 String 으로 받는다
-            - 내부에서 Jason object로 바꿔서 array로 만든다음
-            - return 을 Jason array 형식으로 한다
-
-        - json object array 로 입력된 모든 정류장 미세먼지 정보를 -> Local DB Dust info table 에 저장하는 메서드
-            - 이름 : saveAllRecentDustDataToLocalDB
-            - Json Array 를 인자로 받는다
-            - 반복문을 돌려서 object 하나씩 뽑은 다음 object 에서 원소 하나씩 뽑은 다음 기존 데이터 밀고 새로 집어넣는다 <= 우선은 이렇게 합시다:)
-            -> 이거 호출한 다음에는 바로 view 갱신하는 메서드 호출해줘야겠네
-
-
         - Local DB 에서 모든 정류장 미세먼지 정보를 버스 stop 정보와 join 해서 Json object array 형태로 반환하는 메서드
-
-
-        - json object array 를 인풋으로 받아서 지도에 띄워주는 메서드? ㅇㅇ 여기에서 map 을 인자로 받아서 .
-            - 이름 : addAllDustInfoMarkerOnMap()
-            - 인자 : 모든 버스 stop 미세먼지 정보를 담고 있는 jsonArray()
-            -
-
-
-
 
      */
 }
