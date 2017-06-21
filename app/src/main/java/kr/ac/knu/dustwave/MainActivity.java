@@ -57,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
 
     //모든 버스 정류장 미세먼지 최신 데이터 array
     public static JSONArray allBusStopDustInfoList;
+
+    // 현재 위치에 해당하는 미세먼지 데이터 object
     public static JSONObject currentLocationDustInfoObject;
 
     @Override
@@ -160,13 +162,16 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
      *
      */
     public void addCenterMarker(double latitude, double longitude) {
-        marker = new MapPOIItem();
-        marker.setItemName("현재 위치");
-        marker.setTag(0);
-        marker.setMapPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude)); //대구 광역시 중심
-        marker.setMarkerType(MapPOIItem.MarkerType.BluePin); // 기본으로 제공하는 BluePin 마커 모양.
-        marker.setSelectedMarkerType(MapPOIItem.MarkerType.BluePin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
-        mapView.addPOIItem(marker);
+        MapPOIItem customMarker = new MapPOIItem();
+        customMarker.setItemName("현재위치");
+        customMarker.setTag(1);
+        customMarker.setMapPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude));
+        customMarker.setMarkerType(MapPOIItem.MarkerType.CustomImage); // 마커타입을 커스텀 마커로 지정.
+        customMarker.setCustomImageResourceId(R.drawable.marker_current_pink); // 마커 이미지.
+        customMarker.setCustomImageAutoscale(true); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
+        customMarker.setCustomImageAnchor(0.5f, 1.0f); // 마커 이미지중 기준이 되는 위치(앵커포인트) 지정 - 마커 이미지 좌측 상단 기준 x(0.0f ~ 1.0f), y(0.0f ~ 1.0f) 값.
+        customMarker.setMoveToCenterOnSelect(true);
+        mapView.addPOIItem(customMarker);
 
     }
 
@@ -439,12 +444,13 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
     public void onAllBusStopDustInfoDataStringArrived(String requestStream) {
         if(requestStream!=null) {
             Log.d("MAIN:onAllBusArrived", requestStream);
-            Log.d("MAIN:onAllBusArrived", "전체 버정 데이터 셋 배열 갯수 : "+allBusStopDustInfo.convertAllRecentDustDataToJasonArray(requestStream).length()+"");
-
             // 일단 JsonArray를 MainActivity(here)의 static 변수에 저장하고, 써먹자.
+            // TODO: 2017. 6. 22. 지금은 바로 스태틱 변수에 저장하는데 이것을 db에 저장하는 형태로 변경하면 됌 여기가 바로 그 타이밍임
+            allBusStopDustInfoList = allBusStopDustInfo.convertAllRecentDustDataToJasonArray(requestStream);
+            Log.d("MAIN:onAllBusArrived", "전체 버정 데이터 셋 배열 갯수 : "+allBusStopDustInfoList.length()+"");
 
         }else {
-            Log.e("MAIN:onAllBusArrived", "NULL 이네요. 아무것도 안 받아와요. ");
+            Log.e("MAIN:onAllBusArrived", "모든 정류장 미세먼지 데이터가 NULL 이네요. 아무것도 안 받아와요. ");
 
         }
 

@@ -3,6 +3,7 @@ package kr.ac.knu.dustwave;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import net.daum.mf.map.api.CameraUpdateFactory;
@@ -11,6 +12,10 @@ import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
 import net.daum.mf.map.api.MapPointBounds;
 import net.daum.mf.map.api.MapView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 /**
@@ -27,6 +32,8 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dmap);
 
+
+
     }
 
     /**
@@ -37,6 +44,7 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
         super.onResume();
 
         createMapView(); // 다음 지도를 생성해서 view 를 채운다.
+
     }
 
     @Override
@@ -66,14 +74,13 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
 
     /**
      * 지도의 중심을 어디로 해서 보여줄지 설정
-     * todo 사용자의 현재위치를 받아서 중심점을 선택하는 기능으로 변경하기, 흠 지도로보기에서는 굳이 사용자 위치 아니고 대구 중심으로 해도 될 것 같기도 하다.
      *
      */
     public void setMapCenter(double latitude, double longitude) {
         addCurrentLocationMarker(latitude, longitude);
 
         // 중심점 변경
-        mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude), true); // 대구광역시
+        mapView.setMapCenterPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude), true);
 
         // 줌 레벨 변경
         mapView.setZoomLevel(2, true);
@@ -90,95 +97,160 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
      *
      */
     public void addCurrentLocationMarker(double latitude, double longitude) {
-        MapPOIItem marker = new MapPOIItem();
-        marker.setItemName("현재 위치");
-        marker.setTag(0);
-        marker.setMapPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude)); //대구 광역시 중심
-        marker.setMarkerType(MapPOIItem.MarkerType.BluePin); // 기본으로 제공하는 BluePin 마커 모양.
-        marker.setSelectedMarkerType(MapPOIItem.MarkerType.BluePin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
-        mapView.addPOIItem(marker);
-
+        MapPOIItem customMarker = new MapPOIItem();
+        customMarker.setItemName("현재위치");
+        customMarker.setTag(1);
+        customMarker.setMapPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude));
+        customMarker.setMarkerType(MapPOIItem.MarkerType.CustomImage); // 마커타입을 커스텀 마커로 지정.
+        customMarker.setCustomImageResourceId(R.drawable.marker_current_pink); // 마커 이미지.
+        customMarker.setCustomImageAutoscale(true); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
+        customMarker.setCustomImageAnchor(0.5f, 1.0f); // 마커 이미지중 기준이 되는 위치(앵커포인트) 지정 - 마커 이미지 좌측 상단 기준 x(0.0f ~ 1.0f), y(0.0f ~ 1.0f) 값.
+        customMarker.setMoveToCenterOnSelect(true);
+        mapView.addPOIItem(customMarker);
     }
 
+    public void addAllBusStopMarker(JSONArray busStopDustInfoList) {
+
+        Log.d("ADD_ALL_MARKER", " 모든 마커 반복문 시작! ");
+        if(busStopDustInfoList == null)
+            return;
+
+        for(int i = 0; i< busStopDustInfoList.length(); i=i+2) {
+            try {
+//                addCustomDustInfoMarker(busStopDustInfoList.getJSONObject(i)); // 마커그리기
+                addCircleOverLay(busStopDustInfoList.getJSONObject(i)); //동그란 오버레이 그리기
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Log.d("ADD_ALL_MARKER", " 모든 마커 반복문 끝! ");
+
+    }
 
     /**
      * 지도 위에 지정된 위치에 maker 를 표시합니다.
      *
      */
-    public void addMarker() {
-        MapPOIItem marker = new MapPOIItem();
-        marker.setItemName("Default Marker");
-        marker.setTag(0);
-        marker.setMapPoint(MapPoint.mapPointWithGeoCoord(35.8714354, 128.601445)); //대구 광역시 중심
-        marker.setMarkerType(MapPOIItem.MarkerType.RedPin); // 기본으로 제공하는 BluePin 마커 모양.
-        marker.setSelectedMarkerType(MapPOIItem.MarkerType.BluePin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
-        mapView.addPOIItem(marker);
+    public void addCustomDustInfoMarker(JSONObject dustInfoObject) {
 
-        //남구
-        MapPOIItem marker2 = new MapPOIItem();
-        marker2.setItemName("남구");
-        marker2.setTag(0);
-        marker2.setMapPoint(MapPoint.mapPointWithGeoCoord(35.8460224,128.59752909999997)); //대구 광역시 남구
-        marker2.setMarkerType(MapPOIItem.MarkerType.YellowPin); // 기본으로 제공하는 BluePin 마커 모양.
-        marker2.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+        double dustInfoPm10; //미세먼지
+        double dustInfoPm25; //초미세먼지
+        double latitude;
+        double longitude;
+        String fineDustLevel; //좋은지 나쁜지 text
+        int markerResourceId;
 
-        mapView.addPOIItem(marker2);
+        try {
+            dustInfoPm10 = Math.random()*200+1;
+//            dustInfoPm10 = dustInfoObject.getDouble(LocalDatabaseKey.dust_info_pm10);
 
-        //북구
-        MapPOIItem marker3 = new MapPOIItem();
-        marker3.setItemName("북구");
-        marker3.setTag(0);
-        marker3.setMapPoint(MapPoint.mapPointWithGeoCoord(35.8857114,128.5828073)); //대구 광역시 북구
-        marker3.setMarkerType(MapPOIItem.MarkerType.YellowPin); // 기본으로 제공하는 BluePin 마커 모양.
-        marker3.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+            dustInfoPm25 = dustInfoObject.getDouble(LocalDatabaseKey.dust_info_pm25);
+            latitude = dustInfoObject.getDouble(LocalDatabaseKey.bus_stop_latitude);
+            longitude = dustInfoObject.getDouble(LocalDatabaseKey.bus_stop_longitude);
 
-        mapView.addPOIItem(marker3);
+
+            if (dustInfoPm10 <= 30) {
+                fineDustLevel = "좋음"; //파랑색
+                markerResourceId = R.drawable.marker_green;
+            } else if (dustInfoPm10 > 30 && dustInfoPm10 <= 80) {
+                fineDustLevel = "보통"; //초록
+                markerResourceId = R.drawable.marker_blue;
+
+            }else if (dustInfoPm10 > 80 && dustInfoPm10 <= 150) {
+                fineDustLevel = "나쁨"; //오린지
+                markerResourceId = R.drawable.marker_orange;
+
+            } else{
+                fineDustLevel = "매우나쁨"; //빨강
+                markerResourceId = R.drawable.marker_red;
+
+            }
+
+            MapPOIItem customMarker = new MapPOIItem();
+            customMarker.setItemName(fineDustLevel); // 좋음인지 나쁨인지
+//            customMarker.setTag(1);
+            customMarker.setMapPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude));
+            customMarker.setMarkerType(MapPOIItem.MarkerType.CustomImage); // 마커타입을 커스텀 마커로 지정.
+            customMarker.setCustomImageResourceId(markerResourceId); // 마커 이미지.
+            customMarker.setCustomImageAutoscale(true); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
+            customMarker.setCustomImageAnchor(0.5f, 1.0f); // 마커 이미지중 기준이 되는 위치(앵커포인트) 지정 - 마커 이미지 좌측 상단 기준 x(0.0f ~ 1.0f), y(0.0f ~ 1.0f) 값.
+            customMarker.setMoveToCenterOnSelect(true);
+            mapView.addPOIItem(customMarker);
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+
     }
+
 
 
     /**
      * 지도 위에 Circle 을 그립니다
      *
      */
-    public void addCircleOverLay() {
+    public void addCircleOverLay(JSONObject dustInfoObject) {
 
 
-        MapCircle circle1 = new MapCircle(
-                MapPoint.mapPointWithGeoCoord(35.8900521, 128.6113282), // center
-                500, // radius
-                Color.argb(128, 0, 255, 0), // strokeColor
-                Color.argb(128, 0, 255, 0) // fillColor
-        );
-        circle1.setTag(1234);
-        mapView.addCircle(circle1);
+        double dustInfoPm10; //미세먼지
+        double dustInfoPm25; //초미세먼지
+        double latitude;
+        double longitude;
+        String fineDustLevel; //좋은지 나쁜지 text
+        int overLayColorId;
 
-        //남구
-        MapCircle circle2 = new MapCircle(
-                MapPoint.mapPointWithGeoCoord(35.8460224,128.59752909999997), // center - 대구광역시 남구
-                2500, // radius
-                Color.argb(50, 0, 255, 0), // strokeColor : green
-                Color.argb(50, 0, 255, 0) // fillColor
-        );
-        circle2.setTag(5678);
-        mapView.addCircle(circle2);
 
-        //북구
-        MapCircle circle3 = new MapCircle(
-                MapPoint.mapPointWithGeoCoord(35.8857114,128.5828073), // center - 대구광역시 북구
-                2500, // radius
-                Color.argb(50, 255, 127, 0), // strokeColor : 주황색
-                Color.argb(50, 255, 127, 0) // fillColor
-        );
-        mapView.addCircle(circle3);
 
-        //동구
-        MapCircle circle4 = new MapCircle(
-                MapPoint.mapPointWithGeoCoord(35.8866012,128.6353024), // center - 대구광역시 동구
-                2500, // radius
-                Color.argb(50, 255, 0, 0), // strokeColor : red
-                Color.argb(50, 255, 0, 0) // fillColor
-        );
-        mapView.addCircle(circle4);
+
+        try {
+            dustInfoPm10 = Math.random()*200+1; // 랜덤값 !
+//            dustInfoPm10 = dustInfoObject.getDouble(LocalDatabaseKey.dust_info_pm10);
+
+            dustInfoPm25 = dustInfoObject.getDouble(LocalDatabaseKey.dust_info_pm25);
+            latitude = dustInfoObject.getDouble(LocalDatabaseKey.bus_stop_latitude);
+            longitude = dustInfoObject.getDouble(LocalDatabaseKey.bus_stop_longitude);
+
+
+            if (dustInfoPm10 <= 30) {
+                fineDustLevel = "좋음"; //파랑색
+                overLayColorId = Color.argb(128,0,0,255);
+            } else if (dustInfoPm10 > 30 && dustInfoPm10 <= 80) {
+                fineDustLevel = "보통"; //초록
+                overLayColorId = Color.argb(128,0,255,0);
+
+            }else if (dustInfoPm10 > 80 && dustInfoPm10 <= 150) {
+                fineDustLevel = "나쁨"; //오린지
+                overLayColorId = Color.argb(128,255,165,0);
+
+            } else{
+                fineDustLevel = "매우나쁨"; //빨강
+                overLayColorId = Color.argb(128,255,0,0);
+
+            }
+
+            MapCircle circle1 = new MapCircle(
+                    MapPoint.mapPointWithGeoCoord(latitude, longitude), // center
+                    150, // radius
+                    overLayColorId, // strokeColor
+                    overLayColorId // fillColor
+            );
+            circle1.setTag(1234);
+            mapView.addCircle(circle1);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+
+
+
 
     }
 
@@ -190,8 +262,9 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
     @Override
     public void onMapViewInitialized(MapView mapView) {
         setMapCenter(MainActivity.latestLatitude, MainActivity.latestLongitude); //지도의 중심점 설정
-        addMarker(); // marker 표시하기
+//        addMarker(); // marker 표시하기
         //addCircleOverLay(); // circle  그리기
+        addAllBusStopMarker(MainActivity.allBusStopDustInfoList);
     }
 
 
