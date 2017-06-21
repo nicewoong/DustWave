@@ -7,14 +7,12 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.daum.mf.map.api.MapPOIItem;
@@ -26,8 +24,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.URL;
-
 public class MainActivity extends AppCompatActivity implements MapView.MapViewEventListener, MapView.POIItemEventListener, MapReverseGeoCoder.ReverseGeoCodingResultListener, LocationListener, CurrentLocationDustInfoHttpRequestListener, AllBusStopDustInfoHttpRequestListener {
 
 
@@ -36,6 +32,8 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
     public TextView fineDustCount; // 미세먼지 수치
     public TextView ultraFineDustCount; // 초 미세먼지 수치
     public TextView textDegreeExpress; // 미세먼지 레벨 표시 (좋음 보통 나쁨 매우나쁨)
+
+    public ImageView fine_dust_level_icon;
 
 
     //map view 를 위한 variables
@@ -113,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
         fineDustCount = (TextView) findViewById(R.id.fine_dust_count);
         ultraFineDustCount = (TextView) findViewById(R.id.ultra_fine_dust_count);
         textDegreeExpress = (TextView) findViewById(R.id.text_degree_express);
+        fine_dust_level_icon = (ImageView) findViewById(R.id.fine_dust_level_icon);
 
     }
 
@@ -196,7 +195,9 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
 
             fineDustCount.setText(dustInfoPm10+""); // 미세먼지
             ultraFineDustCount.setText(dustInfoPm25+""); // 초미세먼지
-            textDegreeExpress.setText(getFineDustLevelText(dustInfoPm10)); // 좋음인지 나쁨인지
+            setFineDustLevelText(dustInfoPm10); // 좋음인지 나쁨인지 텍스트, 텍스트 컬러
+            setFineDustLevelImage(dustInfoPm10); // 아이콘
+
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -212,16 +213,23 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
      * @param fineDustPm10
      * @return
      */
-    public String getFineDustLevelText(double fineDustPm10) {
+    public void setFineDustLevelText(double fineDustPm10) {
 
-        if (fineDustPm10 <= 30)
-            return "좋음"; //파랑색
-        else if (fineDustPm10 > 30 && fineDustPm10 <= 80)
-            return "보통"; //초록색
-        else if (fineDustPm10 > 80 && fineDustPm10 <= 150)
-            return "나쁨"; //주황색
-        else
-            return "매우나쁨"; //빨강색
+        if (fineDustPm10 <= 30) {
+            textDegreeExpress.setText("좋음"); //파랑색
+            textDegreeExpress.setTextColor(getResources().getColor(R.color.pretty_blue));
+        } else if (fineDustPm10 > 30 && fineDustPm10 <= 80) {
+            textDegreeExpress.setText("보통"); //파랑색
+            textDegreeExpress.setTextColor(getResources().getColor(R.color.pretty_green));
+
+        }else if (fineDustPm10 > 80 && fineDustPm10 <= 150) {
+            textDegreeExpress.setText("나쁨"); //파랑색
+            textDegreeExpress.setTextColor(getResources().getColor(R.color.pretty_orange));
+        } else{
+            textDegreeExpress.setText("매우나쁨"); //파랑색
+            textDegreeExpress.setTextColor(getResources().getColor(R.color.red));
+        }
+
     }
 
 
@@ -229,12 +237,19 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
 
         if (fineDustPm10 <= 30) {
 //            return "좋음"; //파랑색
+            fine_dust_level_icon.setImageResource(R.drawable.face_icon_good);
         }else if (fineDustPm10 > 30 && fineDustPm10 <= 80) {
 //            return "보통"; //초록색
+            fine_dust_level_icon.setImageResource(R.drawable.face_icon_normal);
+
         }else if (fineDustPm10 > 80 && fineDustPm10 <= 150) {
 //            return "나쁨"; //주황색
+            fine_dust_level_icon.setImageResource(R.drawable.face_icon_bad);
+
         }else {
 //            return "매우나쁨"; //빨강색
+            fine_dust_level_icon.setImageResource(R.drawable.face_icon_too_bad);
+
         }
 
     }

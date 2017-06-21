@@ -39,8 +39,8 @@
 
 
             <ImageView
-                android:id="@+id/user_info_avatar"
-                android:src="@drawable/smile_icon"
+                android:id="@+id/fine_dust_level_icon"
+                android:src="@drawable/face_icon_normal"
                 android:layout_marginTop="20dp"
                 android:layout_below="@id/textview_current_location"
                 android:layout_centerHorizontal="true"
@@ -50,12 +50,12 @@
             <TextView
                 android:id="@+id/text_degree_express"
                 android:layout_marginTop="10dp"
-                android:layout_below="@id/user_info_avatar"
+                android:layout_below="@id/fine_dust_level_icon"
                 android:textSize="26sp"
                 android:layout_centerHorizontal="true"
                 android:fontFamily="sans-serif-light"
                 android:textStyle="bold"
-                android:textColor="@color/pretty_blue"
+                android:textColor="@color/pretty_green"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="보통"/>
