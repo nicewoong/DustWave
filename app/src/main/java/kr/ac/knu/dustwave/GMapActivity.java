@@ -135,6 +135,7 @@ public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallba
             googleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(latitude, longitude))
                     .title(fineDustLevel)
+                    .alpha(0.6f) // 0 이 완전 투명
                     .icon(BitmapDescriptorFactory.fromResource(markerResourceId)));
 
 
