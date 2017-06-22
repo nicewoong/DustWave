@@ -74,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
         }
         Log.d("MainActivity:onCreate()","위치정보 업데이트를 요청합니다. ");
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+
+        createSmallMapView(); // 가려진 뷰가 다시 생성될 때 다음 지도를 생성해서 view 를 채운다.
     }
 
     /**
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
     protected void onResume() {
         super.onResume();
 
-        createSmallMapView(); // 가려진 뷰가 다시 생성될 때 다음 지도를 생성해서 view 를 채운다.
+
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -100,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
     @Override
     protected void onPause() {
         super.onPause();
-        mapViewContainer.removeAllViews();
+//        mapViewContainer.removeAllViews();
 
     }
 

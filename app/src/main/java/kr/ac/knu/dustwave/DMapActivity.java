@@ -117,8 +117,8 @@ public class DMapActivity extends AppCompatActivity implements MapView.MapViewEv
 
         for(int i = 0; i< busStopDustInfoList.length(); i=i+2) {
             try {
-//                addCustomDustInfoMarker(busStopDustInfoList.getJSONObject(i)); // 마커그리기
-                addCircleOverLay(busStopDustInfoList.getJSONObject(i)); //동그란 오버레이 그리기
+                addCustomDustInfoMarker(busStopDustInfoList.getJSONObject(i)); // 마커그리기
+//                addCircleOverLay(busStopDustInfoList.getJSONObject(i)); //동그란 오버레이 그리기
             } catch (JSONException e) {
                 e.printStackTrace();
             }
