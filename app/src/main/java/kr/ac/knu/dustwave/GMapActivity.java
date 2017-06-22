@@ -12,6 +12,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.ClusterManager;
 
 import net.daum.mf.map.api.MapPOIItem;
 import net.daum.mf.map.api.MapPoint;
@@ -53,9 +54,11 @@ public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallba
         // 현재 위치 (중점) 마커 표시
         addCurrentLocationMarker(new LatLng(MainActivity.latestLatitude, MainActivity.latestLongitude), googleMap);
 
-        // 받아온 모든 정류장 미세먼지 데이터
-        addAllBusStopMarker(MainActivity.allBusStopDustInfoList, googleMap);
+        ClusterManager<BusStopClusterItem> mClusterManager = new ClusterManager<>(this, googleMap);
+//        googleMap.setOnCameraChangeListener(mClusterManager);
 
+        // 받아온 모든 정류장 미세먼지 데이터
+//        addAllBusStopMarker(MainActivity.allBusStopDustInfoList, googleMap);
     }
 
 
