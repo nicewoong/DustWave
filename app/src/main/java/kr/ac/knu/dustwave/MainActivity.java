@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
     @Override
     public void onMapViewSingleTapped(MapView mapView, MapPoint mapPoint) {
         // DMapActivity 를 호출합니다.
-        Intent intent = new Intent(this, DMapActivity.class);
+        Intent intent = new Intent(this, GMapActivity.class);
         startActivity(intent);
         Log.d(this.getLocalClassName(), "map clicked ! ");
 

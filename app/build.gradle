@@ -26,6 +26,8 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:24.2.1'
     testCompile 'junit:junit:4.12'
+
+    compile 'com.google.android.gms:play-services:8.3.0'
     //NAVER Map api
     compile 'com.naver.maps.open:naver-map-api:2.1.2@aar'
 
