@@ -27,7 +27,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DMapActivity"></activity>
+        <activity android:name=".DMapActivity" />
+        <activity android:name=".GMapActivity"></activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAjnQPEa36J9xEaYAJYvHgeahPagXXz7do"/>
+
     </application>
 
 </manifest>
