@@ -30,7 +30,7 @@ dependencies {
     // 구글맵의 클러스터링 기능 사용
     compile 'com.google.maps.android:android-maps-utils:0.4+'
     //Google map 사용
-    compile 'com.google.android.gms:play-services:8.3.0'
+    compile 'com.google.android.gms:play-services:9.4.0'
     //NAVER Map api
     compile 'com.naver.maps.open:naver-map-api:2.1.2@aar'
 
