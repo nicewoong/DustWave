@@ -11,6 +11,12 @@ public class BusStopClusterItem implements ClusterItem {
     private LatLng location;
     private String address;
 
+
+    public BusStopClusterItem(LatLng location) {
+        this.location = location;
+    }
+
+
     public BusStopClusterItem(LatLng location, String address) {
         this.location = location;
         this.address = address;

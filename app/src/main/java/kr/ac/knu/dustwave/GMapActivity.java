@@ -26,6 +26,9 @@ public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallba
 
     public static final String LOG_TAG = "GMapActivity_LOG";
 
+    ClusterManager<BusStopClusterItem> mClusterManager;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,11 +57,16 @@ public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallba
         // 현재 위치 (중점) 마커 표시
         addCurrentLocationMarker(new LatLng(MainActivity.latestLatitude, MainActivity.latestLongitude), googleMap);
 
-        ClusterManager<BusStopClusterItem> mClusterManager = new ClusterManager<>(this, googleMap);
-//        googleMap.setOnCameraChangeListener(mClusterManager);
+        mClusterManager = new ClusterManager<>(this, googleMap);
+        googleMap.setOnCameraIdleListener(mClusterManager);
 
-        // 받아온 모든 정류장 미세먼지 데이터
+
+        // 받아온 모든 정류장 미세먼지 데이터 (마커만)
 //        addAllBusStopMarker(MainActivity.allBusStopDustInfoList, googleMap);
+
+        // 받아온 모든 정류장 미세먼지 데이터 (클러스터 마커로 )
+        addAllBusStopClusterMarker(MainActivity.allBusStopDustInfoList, googleMap);
+
     }
 
 
@@ -94,6 +102,7 @@ public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallba
         Log.d("ADD_ALL_MARKER", " 모든 마커 반복문 끝! ");
 
     }
+
 
     /**
      * 지도 위에 지정된 위치에 maker 를 표시합니다.
@@ -150,6 +159,95 @@ public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallba
 
 
     }
+
+
+    /**
+     * addAllBusStopMarker 와 같은 기능을 하는 클러스터용 메서드 구현
+     *
+     * @param busStopDustInfoList
+     * @param googleMap
+     */
+    public void addAllBusStopClusterMarker(JSONArray busStopDustInfoList, GoogleMap googleMap) {
+
+        Log.d("ADD_ALL_MARKER", " 모든 마커 반복문 시작! ");
+        if(busStopDustInfoList == null)
+            return;
+
+        for(int i = 0; i< busStopDustInfoList.length(); i=i+2) {
+            try {
+                addCustomDustInfoClusterMarker(busStopDustInfoList.getJSONObject(i), googleMap); // 마커그리기
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        Log.d("ADD_ALL_MARKER", " 모든 마커 반복문 끝! ");
+
+    }
+
+
+    /**
+     * 지도 위에 지정된 위치에 maker 를 표시합니다.
+     *
+     */
+    public void addCustomDustInfoClusterMarker(JSONObject dustInfoObject, GoogleMap googleMap) {
+
+        double dustInfoPm10; //미세먼지
+        double dustInfoPm25; //초미세먼지
+        double latitude;
+        double longitude;
+        String fineDustLevel; //좋은지 나쁜지 text
+        int markerResourceId;
+
+
+
+        try {
+            dustInfoPm10 = Math.random() * 200 + 1;
+            dustInfoPm10 = dustInfoObject.getDouble(LocalDatabaseKey.dust_info_pm10);
+
+            dustInfoPm25 = dustInfoObject.getDouble(LocalDatabaseKey.dust_info_pm25);
+            latitude = dustInfoObject.getDouble(LocalDatabaseKey.bus_stop_latitude);
+            longitude = dustInfoObject.getDouble(LocalDatabaseKey.bus_stop_longitude);
+
+
+            BusStopClusterItem busStopClusterItem = new BusStopClusterItem(new LatLng(latitude, longitude));
+            mClusterManager.addItem(busStopClusterItem);
+
+
+
+//            if (dustInfoPm10 <= 30) {
+//                fineDustLevel = "좋음"; //파랑색
+//                markerResourceId = R.drawable.marker_green;
+//            } else if (dustInfoPm10 > 30 && dustInfoPm10 <= 80) {
+//                fineDustLevel = "보통"; //초록
+//                markerResourceId = R.drawable.marker_blue;
+//
+//            } else if (dustInfoPm10 > 80 && dustInfoPm10 <= 150) {
+//                fineDustLevel = "나쁨"; //오린지
+//                markerResourceId = R.drawable.marker_orange;
+//
+//            } else {
+//                fineDustLevel = "매우나쁨"; //빨강
+//                markerResourceId = R.drawable.marker_red;
+//
+//            }
+//
+//            // 마커 추가
+//            googleMap.addMarker(new MarkerOptions()
+//                    .position(new LatLng(latitude, longitude))
+//                    .title(fineDustLevel)
+//                    .alpha(0.6f) // 0 이 완전 투명
+//                    .icon(BitmapDescriptorFactory.fromResource(markerResourceId)));
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+
 
 
 
