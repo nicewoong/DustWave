@@ -13,14 +13,16 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallback {
+public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, ClusterManager.OnClusterItemClickListener<BusStopClusterItem> {
 
 
     public static final String LOG_TAG = "GMapActivity_LOG";
@@ -57,14 +59,19 @@ public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallba
         addCurrentLocationMarker(new LatLng(MainActivity.latestLatitude, MainActivity.latestLongitude), googleMap);
 
         mClusterManager = new ClusterManager<>(this, googleMap);
+        mClusterManager.setOnClusterItemClickListener(this);
         googleMap.setOnCameraIdleListener(mClusterManager);
+        googleMap.setOnMarkerClickListener(mClusterManager);
+
+
 
 
         // 받아온 모든 정류장 미세먼지 데이터 (커스텀 마커만 not Clustering)
 //        addAllBusStopMarker(MainActivity.allBusStopDustInfoList, googleMap);
 
-        // 받아온 모든 정류장 미세먼지 데이터 (클러스터 마커로 )
-        addAllBusStopClusterMarker(MainActivity.allBusStopDustInfoList, googleMap);
+        // 받아온 모든 정류장 미세먼지 데이터 (클러스터 마커로)
+         addAllBusStopClusterMarker(MainActivity.allBusStopDustInfoList, googleMap);
+
         // 받아온 모든 정류장 미세먼지 데이터를 Circle overlay 로 표시
         addAllBusStopCircle(MainActivity.allBusStopDustInfoList, googleMap);
 
@@ -265,8 +272,8 @@ public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallba
         int circleColor;
 
         try {
-            dustInfoPm10 = Math.random()*200+1; // 다양한 색상을 위한 랜덤값!
-//            dustInfoPm10 = dustInfoObject.getDouble(LocalDatabaseKey.dust_info_pm10); // 진짜 값
+//            dustInfoPm10 = Math.random()*200+1; // 다양한 색상을 위한 랜덤값!
+            dustInfoPm10 = dustInfoObject.getDouble(LocalDatabaseKey.dust_info_pm10); // 진짜 값
             dustInfoPm25 = dustInfoObject.getDouble(LocalDatabaseKey.dust_info_pm25);
             latitude = dustInfoObject.getDouble(LocalDatabaseKey.bus_stop_latitude);
             longitude = dustInfoObject.getDouble(LocalDatabaseKey.bus_stop_longitude);
@@ -308,6 +315,20 @@ public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallba
     }
 
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Log.d("onClusterClick", "마커를 클릭하였습니다 . " + marker.toString());
 
+        return false;
+    }
 
+    @Override
+    public boolean onClusterItemClick(BusStopClusterItem busStopClusterItem) {
+
+        Log.d("onClusterClick", "클러스터마커를 클릭하였습니다 . " + busStopClusterItem.toString());
+        // TODO: 2017. 6. 23. 다이얼로그 하나 띄우고 busStopClusterItem 에서 정보 뽑아서 보여주면 될 듯!
+
+        return false;
+    }
+    
 }

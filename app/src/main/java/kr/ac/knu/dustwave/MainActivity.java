@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
     public TextView currentLocation; // 현재 위치에 대한 한글 주소 표시
     public TextView fineDustCount; // 미세먼지 수치
     public TextView ultraFineDustCount; // 초 미세먼지 수치
+    public TextView dustSummaryCount; // 종합 수치
+
     public TextView textDegreeExpress; // 미세먼지 레벨 표시 (좋음 보통 나쁨 매우나쁨)
 
     public ImageView fine_dust_level_icon;
@@ -115,6 +117,8 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
         fineDustCount = (TextView) findViewById(R.id.fine_dust_count);
         ultraFineDustCount = (TextView) findViewById(R.id.ultra_fine_dust_count);
         textDegreeExpress = (TextView) findViewById(R.id.text_degree_express);
+        dustSummaryCount = (TextView) findViewById(R.id.dust_summary_count);
+
         fine_dust_level_icon = (ImageView) findViewById(R.id.fine_dust_level_icon);
 
     }
@@ -164,16 +168,26 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
      *
      */
     public void addCenterMarker(double latitude, double longitude) {
-        MapPOIItem customMarker = new MapPOIItem();
-        customMarker.setItemName("현재위치");
-        customMarker.setTag(1);
-        customMarker.setMapPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude));
-        customMarker.setMarkerType(MapPOIItem.MarkerType.CustomImage); // 마커타입을 커스텀 마커로 지정.
-        customMarker.setCustomImageResourceId(R.drawable.marker_current_pink); // 마커 이미지.
-        customMarker.setCustomImageAutoscale(true); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
-        customMarker.setCustomImageAnchor(0.5f, 1.0f); // 마커 이미지중 기준이 되는 위치(앵커포인트) 지정 - 마커 이미지 좌측 상단 기준 x(0.0f ~ 1.0f), y(0.0f ~ 1.0f) 값.
-        customMarker.setMoveToCenterOnSelect(true);
-        mapView.addPOIItem(customMarker);
+
+//        MapPOIItem customMarker = new MapPOIItem();
+//        customMarker.setItemName("현재위치");
+//        customMarker.setTag(1);
+//        customMarker.setMapPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude));
+//        customMarker.setMarkerType(MapPOIItem.MarkerType.CustomImage); // 마커타입을 커스텀 마커로 지정.
+//        customMarker.setCustomImageResourceId(R.drawable.marker_current_pink); // 마커 이미지.
+//        customMarker.setCustomImageAutoscale(true); // hdpi, xhdpi 등 안드로이드 플랫폼의 스케일을 사용할 경우 지도 라이브러리의 스케일 기능을 꺼줌.
+//        customMarker.setCustomImageAnchor(0.5f, 1.0f); // 마커 이미지중 기준이 되는 위치(앵커포인트) 지정 - 마커 이미지 좌측 상단 기준 x(0.0f ~ 1.0f), y(0.0f ~ 1.0f) 값.
+//        customMarker.setMoveToCenterOnSelect(true);
+//        mapView.addPOIItem(customMarker);
+
+        MapPOIItem marker = new MapPOIItem();
+        marker.setItemName("현재위치");
+        marker.setTag(0);
+        marker.setMapPoint(MapPoint.mapPointWithGeoCoord(latitude, longitude));
+        marker.setMarkerType(MapPOIItem.MarkerType.BluePin); // 기본으로 제공하는 BluePin 마커 모양.
+        marker.setSelectedMarkerType(MapPOIItem.MarkerType.RedPin); // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
+        mapView.addPOIItem(marker);
+
 
     }
 
@@ -199,9 +213,12 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
         try {
             dustInfoPm10 = currentLocationDustInfo.getDouble(LocalDatabaseKey.dust_info_pm10);
             dustInfoPm25 = currentLocationDustInfo.getDouble(LocalDatabaseKey.dust_info_pm25);
+            int dustSummary = (int) (dustInfoPm10 + dustInfoPm25)*2/3; // 임의로 종합수치 계산 완료
 
             fineDustCount.setText(dustInfoPm10+""); // 미세먼지
             ultraFineDustCount.setText(dustInfoPm25+""); // 초미세먼지
+            dustSummaryCount.setText(dustSummary+""); // 초미세먼지
+
             setFineDustLevelText(dustInfoPm10); // 좋음인지 나쁨인지 텍스트, 텍스트 컬러
             setFineDustLevelImage(dustInfoPm10); // 아이콘
 

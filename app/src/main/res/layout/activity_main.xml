@@ -89,7 +89,7 @@
                         android:fontFamily="sans-serif-light"
                         android:textColor="@color/default_font"
                         android:textSize="20sp"
-                        android:text="39"
+                        android:text="29"
                         android:paddingTop="6dp"
                         android:paddingBottom="6dp"
                         android:layout_centerHorizontal="true"
@@ -131,7 +131,7 @@
 
                 </RelativeLayout>
 
-
+                <!-- 통합지수 표현하는 부분-->
                 <RelativeLayout
                     android:id="@+id/user_info_else"
                     android:layout_toRightOf="@id/user_info_follower_zone"
@@ -140,7 +140,7 @@
                     android:layout_width="80dp"
                     android:layout_height="wrap_content">
                     <TextView
-                        android:id="@+id/elsewhere_indicator"
+                        android:id="@+id/dust_summary"
                         android:layout_marginTop="5dp"
                         android:layout_centerHorizontal="true"
                         android:textColor="@color/text_default_color"
@@ -148,13 +148,28 @@
                         android:text="통합지수"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
-                    <ImageView
-                        android:layout_below="@id/elsewhere_indicator"
+
+                    <TextView
+                        android:id="@+id/dust_summary_count"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-light"
+                        android:textColor="@color/default_font"
+                        android:textSize="20sp"
+                        android:text="49"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
                         android:layout_centerHorizontal="true"
-                        android:src="@drawable/earth"
-                        android:layout_marginTop="10dp"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp" />
+                        android:layout_below="@id/dust_summary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <!--<ImageView-->
+                        <!--android:layout_below="@id/elsewhere_indicator"-->
+                        <!--android:layout_centerHorizontal="true"-->
+                        <!--android:src="@drawable/earth"-->
+                        <!--android:layout_marginTop="10dp"-->
+                        <!--android:layout_width="25dp"-->
+                        <!--android:layout_height="25dp" />-->
 
                 </RelativeLayout>
             </RelativeLayout>
