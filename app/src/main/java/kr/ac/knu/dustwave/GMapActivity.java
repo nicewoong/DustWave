@@ -1,6 +1,8 @@
 package kr.ac.knu.dustwave;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -215,7 +217,7 @@ public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallba
             longitude = dustInfoObject.getDouble(LocalDatabaseKey.bus_stop_longitude);
 
 
-            BusStopClusterItem busStopClusterItem = new BusStopClusterItem(new LatLng(latitude, longitude));
+            BusStopClusterItem busStopClusterItem = new BusStopClusterItem(new LatLng(latitude, longitude), dustInfoObject);
             mClusterManager.addItem(busStopClusterItem);
 
 
@@ -325,10 +327,55 @@ public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallba
     @Override
     public boolean onClusterItemClick(BusStopClusterItem busStopClusterItem) {
 
-        Log.d("onClusterClick", "클러스터마커를 클릭하였습니다 . " + busStopClusterItem.toString());
+        Log.d("onClusterClick", "클러스터마커를 클릭하였습니다 . " + busStopClusterItem.getDustInfoObject());
         // TODO: 2017. 6. 23. 다이얼로그 하나 띄우고 busStopClusterItem 에서 정보 뽑아서 보여주면 될 듯!
+
+        try {
+            showDetailDialog(busStopClusterItem.getDustInfoObject());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         return false;
     }
-    
+
+    public void showDetailDialog(JSONObject dustInfoObject) throws JSONException {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("대구광역시");
+        String dustInfo = "미세먼지 : " + dustInfoObject.getString("PM_10");
+        dustInfo += "\n초미세먼지 : " + dustInfoObject.getString("PM_25");
+        builder.setMessage(dustInfo);
+
+        builder.setNegativeButton("확인",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+        builder.show();
+    }
+
+    public String getDustLevel(double dustInfoPm10) {
+        String fineDustLevel; //좋은지 나쁜지 text
+
+
+            if (dustInfoPm10 <= 30) {
+                fineDustLevel = "좋음"; //파랑색
+            } else if (dustInfoPm10 > 30 && dustInfoPm10 <= 80) {
+                fineDustLevel = "보통"; //초록
+
+            }else if (dustInfoPm10 > 80 && dustInfoPm10 <= 150) {
+                fineDustLevel = "나쁨"; //오린지
+
+            } else{
+                fineDustLevel = "매우나쁨"; //빨강
+
+            }
+
+        return "";
+    }// End of Method "getDustLevel()"
+
+
+
 }

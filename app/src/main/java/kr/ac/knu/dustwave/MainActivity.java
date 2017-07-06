@@ -47,6 +47,9 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
     public static double latestLatitude = 35.8714354;
     public static double latestLongitude = 128.601445;
 
+    public double latitudeKNU = 35.8900521;
+    public double longitudeKNU = 128.6113282;
+
 
     // Acquire a reference to the system Location Manager
     LocationManager locationManager;
@@ -391,7 +394,10 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
         latestLongitude = location.getLongitude();
 
         // 위도 경도에 따른 미세먼지 데이터 하나 요청
-        currentLocationDustInfo.requestCurrentDataByLocation(this, latestLatitude, latestLongitude);
+//        currentLocationDustInfo.requestCurrentDataByLocation(this, latestLatitude, latestLongitude);
+
+        //녹화용으로 위치 고정하겠습니다
+        currentLocationDustInfo.requestCurrentDataByLocation(this, latitudeKNU, longitudeKNU);
 
         // small map view 의  중심점 변경 + 줌 레벨 변경
         setMapCenter(location.getLatitude(), location.getLongitude());
@@ -466,7 +472,8 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
             // 일단 JsonArray를 MainActivity(here)의 static 변수에 저장하고, 써먹자.
             // TODO: 2017. 6. 22. 지금은 바로 스태틱 변수에 저장하는데 이것을 db에 저장하는 형태로 변경하면 됌 여기가 바로 그 타이밍임
             allBusStopDustInfoList = allBusStopDustInfo.convertAllRecentDustDataToJasonArray(requestStream);
-            Log.d("MAIN:onAllBusArrived", "전체 버정 데이터 셋 배열 갯수 : "+allBusStopDustInfoList.length()+"");
+            if(allBusStopDustInfoList != null)
+                Log.d("MAIN:onAllBusArrived", "전체 버정 데이터 셋 배열 갯수 : "+allBusStopDustInfoList.length()+"");
 
         }else {
             Log.e("MAIN:onAllBusArrived", "모든 정류장 미세먼지 데이터가 NULL 이네요. 아무것도 안 받아와요. ");
