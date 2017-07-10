@@ -35,7 +35,7 @@
                 android:textColor="@color/default_font"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="대구광역시"/>
+                android:text="대구광역시 복현동"/>
 
 
             <ImageView

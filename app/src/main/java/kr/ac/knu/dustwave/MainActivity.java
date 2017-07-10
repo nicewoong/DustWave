@@ -44,11 +44,14 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
     MapPOIItem marker; //중심점 마커
 
     //가장 최신 위도경도 => default 는 대구광역시 중심입니다.
-    public static double latestLatitude = 35.8714354;
-    public static double latestLongitude = 128.601445;
+//    public static double latestLatitude = 35.8714354;
+//    public static double latestLongitude = 128.601445;
+    // default 를 경북대학교로 합니다
+    public static double latestLatitude = 35.8868786;
+    public static double latestLongitude = 128.60849910000002;
 
-    public double latitudeKNU = 35.8900521;
-    public double longitudeKNU = 128.6113282;
+    public double latitudeKNU = 35.8868786;
+    public double longitudeKNU = 128.60849910000002;
 
 
     // Acquire a reference to the system Location Manager
@@ -385,34 +388,37 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
      */
     @Override
     public void onLocationChanged(Location location) {
+//
+//        // Called when a new location is found by the network location provider.
+//        Log.d("LOCATION UPDATED : ", location.toString());
+//
+////        // 최신 위도경도 값 최신화
+////        latestLatitude = location.getLatitude();
+////        latestLongitude = location.getLongitude();
+//
+//        // 녹화용으로 경북대학교로 합니당
+//        latestLatitude = latitudeKNU;
+//        latestLongitude = longitudeKNU;
+//
+//
+         //위도 경도에 따른 미세먼지 데이터 하나 요청
+        currentLocationDustInfo.requestCurrentDataByLocation(this, latestLatitude, latestLongitude);
 
-        // Called when a new location is found by the network location provider.
-        Log.d("LOCATION UPDATED : ", location.toString());
-
-        // 최신 위도경도 값 최신화
-        latestLatitude = location.getLatitude();
-        latestLongitude = location.getLongitude();
-
-        // 위도 경도에 따른 미세먼지 데이터 하나 요청
-//        currentLocationDustInfo.requestCurrentDataByLocation(this, latestLatitude, latestLongitude);
-
-        //녹화용으로 위치 고정하겠습니다
-        currentLocationDustInfo.requestCurrentDataByLocation(this, latitudeKNU, longitudeKNU);
-
-        // small map view 의  중심점 변경 + 줌 레벨 변경
-        setMapCenter(location.getLatitude(), location.getLongitude());
-
-        //위도경도 정보로 해당 주소지명 가져오기 => call back method 에서 결과 처리합시다.
-        MapReverseGeoCoder reverseGeoCoder =
-                new MapReverseGeoCoder(getApplicationContext().getResources().getString(R.string.daum_map_view_api_key),
-                        MapPoint.mapPointWithGeoCoord(location.getLatitude(), location.getLongitude()),
-                        this,
-                        MainActivity.this);
-
-        reverseGeoCoder.startFindingAddress();
-
-
-
+//
+//        // small map view 의  중심점 변경 + 줌 레벨 변경
+////        setMapCenter(location.getLatitude(), location.getLongitude());
+//
+//        //위도경도 정보로 해당 주소지명 가져오기 => call back method 에서 결과 처리합시다.
+////        MapReverseGeoCoder reverseGeoCoder =
+////                new MapReverseGeoCoder(getApplicationContext().getResources().getString(R.string.daum_map_view_api_key),
+////                        MapPoint.mapPointWithGeoCoord(latestLatitude, latestLongitude),
+////                        this,
+////                        MainActivity.this);
+////
+////        reverseGeoCoder.startFindingAddress();
+//
+//
+//
         /*
         한 번 받아왔으니 중지 !
          */
@@ -421,7 +427,7 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
             return;
         }
         locationManager.removeUpdates(this);
-
+//
 
 
     }
@@ -454,7 +460,7 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
             // json object로 변경
             currentLocationDustInfoObject = currentLocationDustInfo.convertCurrentLocationDustDataToObject(requestStream);
             // 뷰 갱신 !!
-            updateCurrentLocationDustDataView(currentLocationDustInfoObject);
+            //updateCurrentLocationDustDataView(currentLocationDustInfoObject); //녹화용으로 주석처리!!
         }else {
             Log.e("MAIN:onArrived", " NULL 이네요. 아무것도 안 받아와요. ");
 

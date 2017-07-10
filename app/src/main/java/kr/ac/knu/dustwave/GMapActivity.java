@@ -6,6 +6,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -341,12 +342,21 @@ public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallba
 
     public void showDetailDialog(JSONObject dustInfoObject) throws JSONException {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("대구광역시");
-        String dustInfo = "미세먼지 : " + dustInfoObject.getString("PM_10");
-        dustInfo += "\n초미세먼지 : " + dustInfoObject.getString("PM_25");
+        builder.setTitle("대일아파트 정류소");
+        String dustInfo = "";
+//        dustInfo += "\n미세먼지 : " + dustInfoObject.getString("PM_10") ;
+//        dustInfo += "\n초미세먼지 : " + dustInfoObject.getString("PM_25");
+        dustInfo += "\n미세먼지 : 보통 (" + dustInfoObject.getString("PM_10") + ")" ;
+        dustInfo += "\n초미세먼지: 보통 (31)\n";
+
+
+
         builder.setMessage(dustInfo);
 
-        builder.setNegativeButton("확인",
+        ImageView image = new ImageView(this);
+        image.setImageResource(R.drawable.small_face_icon_normal);
+
+        builder.setView(image).setPositiveButton("확인",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 
