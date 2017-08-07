@@ -7,6 +7,7 @@ import org.json.JSONObject;
 
 /**
  * Created by nicewoong on 2017. 6. 23..
+ * 구글맵에서 버스정류장 갯수 클러스터링 표시 위한 클래스
  */
 
 public class BusStopClusterItem implements ClusterItem {

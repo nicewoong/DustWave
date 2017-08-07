@@ -44,11 +44,9 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
     MapPOIItem marker; //중심점 마커
 
     //가장 최신 위도경도 => default 는 대구광역시 중심입니다.
-//    public static double latestLatitude = 35.8714354;
-//    public static double latestLongitude = 128.601445;
-    // default 를 경북대학교로 합니다
-    public static double latestLatitude = 35.8868786;
-    public static double latestLongitude = 128.60849910000002;
+    public static double latestLatitude = 35.8714354;
+    public static double latestLongitude = 128.601445;
+
 
     public double latitudeKNU = 35.8868786;
     public double longitudeKNU = 128.60849910000002;
@@ -142,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
         mapViewContainer.addView(mapView);
 
         //이벤트리스너 등록
-        mapView.setMapViewEventListener(this); // this에 MapView.MapViewEventListener 구현.
+        mapView.setMapViewEventListener(this); // this 에 MapView.MapViewEventListener 구현.
         mapView.setPOIItemEventListener(this);
 
 
@@ -164,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
         // 줌 아웃
         mapView.zoomOut(false);
 
-        // 중심점에 Marker로 표시해줍니다
+        // 중심점에 Marker 로 표시해줍니다
         addCenterMarker(latitude, longitude);
     }
 
@@ -388,44 +386,37 @@ public class MainActivity extends AppCompatActivity implements MapView.MapViewEv
      */
     @Override
     public void onLocationChanged(Location location) {
-//
-//        // Called when a new location is found by the network location provider.
-//        Log.d("LOCATION UPDATED : ", location.toString());
-//
-////        // 최신 위도경도 값 최신화
-////        latestLatitude = location.getLatitude();
-////        latestLongitude = location.getLongitude();
-//
-//        // 녹화용으로 경북대학교로 합니당
-//        latestLatitude = latitudeKNU;
-//        latestLongitude = longitudeKNU;
-//
-//
+        // Called when a new location is found by the network location provider.
+        Log.d("LOCATION UPDATED : ", location.toString());
+        // 최신 위도경도 값 최신화
+        latestLatitude = location.getLatitude();
+        latestLongitude = location.getLongitude();
+
          //위도 경도에 따른 미세먼지 데이터 하나 요청
         currentLocationDustInfo.requestCurrentDataByLocation(this, latestLatitude, latestLongitude);
 
 //
-//        // small map view 의  중심점 변경 + 줌 레벨 변경
-////        setMapCenter(location.getLatitude(), location.getLongitude());
-//
-//        //위도경도 정보로 해당 주소지명 가져오기 => call back method 에서 결과 처리합시다.
-////        MapReverseGeoCoder reverseGeoCoder =
-////                new MapReverseGeoCoder(getApplicationContext().getResources().getString(R.string.daum_map_view_api_key),
-////                        MapPoint.mapPointWithGeoCoord(latestLatitude, latestLongitude),
-////                        this,
-////                        MainActivity.this);
-////
-////        reverseGeoCoder.startFindingAddress();
-//
-//
-//
-        /*
-        한 번 받아왔으니 중지 !
-         */
+        // small map view 의  중심점 변경 + 줌 레벨 변경
+        setMapCenter(location.getLatitude(), location.getLongitude());
+
+        //위도경도 정보로 해당 주소지명 가져오기 => call back method 에서 결과 처리합시다.
+        MapReverseGeoCoder reverseGeoCoder =
+                new MapReverseGeoCoder(getApplicationContext().getResources().getString(R.string.daum_map_view_api_key),
+                        MapPoint.mapPointWithGeoCoord(latestLatitude, latestLongitude),
+                        this,
+                        MainActivity.this);
+
+        reverseGeoCoder.startFindingAddress();
+
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             return;
         }
+
+         /*
+        한 번 받아왔으니 중지 !
+         */
         locationManager.removeUpdates(this);
 //
 

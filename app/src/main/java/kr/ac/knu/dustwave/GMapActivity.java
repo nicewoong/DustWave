@@ -239,10 +239,14 @@ public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallba
      */
     public void addAllBusStopCircle(JSONArray busStopDustInfoList, GoogleMap googleMap) {
 
-        Log.d("ADD_ALL_Circle", " 모든 마커 반복문 시작! ");
-        if(busStopDustInfoList == null)
+
+        Log.d("ADD_ALL_Circle", " 모든 마커 반복문 시작! "); //Log
+
+        if(busStopDustInfoList == null) // Null 이라면 null 에러 발생하기 때문에 함수 종료해줍니다
             return;
 
+        // 마커 숫자가 너무 많아서 멈춤현상 발생
+        // 그래서 반틈만 표시하기 위해 반복문 +2 증가
         for(int i = 0; i< busStopDustInfoList.length(); i=i+2) {
             try {
                 addDustInfoCircleOverlay(busStopDustInfoList.getJSONObject(i), googleMap); // 마커그리기
@@ -275,7 +279,7 @@ public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallba
         int circleColor;
 
         try {
-//            dustInfoPm10 = Math.random()*200+1; // 다양한 색상을 위한 랜덤값!
+//            dustInfoPm10 = Math.random()*200+1; // 다양한 색상 테스트용 랜덤값!
             dustInfoPm10 = dustInfoObject.getDouble(LocalDatabaseKey.dust_info_pm10); // 진짜 값
             dustInfoPm25 = dustInfoObject.getDouble(LocalDatabaseKey.dust_info_pm25);
             latitude = dustInfoObject.getDouble(LocalDatabaseKey.bus_stop_latitude);
@@ -306,7 +310,7 @@ public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallba
                     .fillColor(circleColor); // 수치에 따른 색상
 
             //옵션을 활용해 써클을 추가합니다
-            Circle circle = googleMap.addCircle(circleOptions); // return 되는 circle 은 나중에 변경가능 (Mutable)
+            Circle circle = googleMap.addCircle(circleOptions); // return 되는 circle 은 나중에 변경가능 할려고 변수로 받아놓는것 (Mutable)
 
 
 
@@ -344,17 +348,16 @@ public class GMapActivity  extends AppCompatActivity implements OnMapReadyCallba
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("대일아파트 정류소");
         String dustInfo = "";
-//        dustInfo += "\n미세먼지 : " + dustInfoObject.getString("PM_10") ;
-//        dustInfo += "\n초미세먼지 : " + dustInfoObject.getString("PM_25");
-        dustInfo += "\n미세먼지 : 보통 (" + dustInfoObject.getString("PM_10") + ")" ;
-        dustInfo += "\n초미세먼지: 보통 (31)\n";
+        dustInfo += "\n미세먼지 : " + dustInfoObject.getString("PM_10") ;
+        dustInfo += "\n초미세먼지 : " + dustInfoObject.getString("PM_25");
+
 
 
 
         builder.setMessage(dustInfo);
 
         ImageView image = new ImageView(this);
-        image.setImageResource(R.drawable.small_face_icon_normal);
+        image.setImageResource(R.drawable.small_face_icon_normal); //<= 미세먼지 보통일 때 이미지
 
         builder.setView(image).setPositiveButton("확인",
                 new DialogInterface.OnClickListener() {
