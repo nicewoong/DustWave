@@ -1,6 +1,6 @@
 ## 프로젝트 개요
 
-<img src="https://github.com/nicewoong/DustWave/blob/master/dust_wave_intro.png" alt="pleet"/>
+<img src="https://github.com/nicewoong/portfolio/blob/master/images/dust_wave_intro.png" alt="pleet"/>
 
 
 ### 대구시 미세먼지 상세농도 실시간 시각화 서비스
